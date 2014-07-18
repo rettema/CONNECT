@@ -241,12 +241,12 @@
                 <artifactId>activation</artifactId>
                 <version>1.1.1</version>
             </dependency>
-			<dependency>
+            <dependency>
                 <groupId>com.sun.faces.extensions</groupId>
                 <artifactId>jsf-extensions-dynamic-faces</artifactId>
                 <version>0.1</version>
             </dependency>
-			<dependency>
+            <dependency>
                 <groupId>com.sun.faces.extensions</groupId>
                 <artifactId>jsf-extensions-common</artifactId>
                 <version>0.1</version>
@@ -284,87 +284,87 @@
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>CONNECTCommonTypesLib</artifactId>
-            <version>4.0.7</version>
+            <version>4.0.7.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>AdapterAuthenticationWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>AdminDistributionWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>AuditRepositoryWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>ComponentWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>ConnectionManagerWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
          <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>DirectWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
          <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>DocRegistryWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>DocRepositoryWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
           <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>DocumentQueryWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>DocumentRetrieveWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
           <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>DocumentSubmissionWebervices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
           <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>HIEMWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
          <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>PatientCorrelationWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>PatientDiscoveryWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>PolicyEngineWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.connectopensource</groupId>
             <artifactId>RedactionEngineWebservices</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.4.1</version>
         </dependency>
         </dependencies>
     </dependencyManagement>

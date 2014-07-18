@@ -32,7 +32,7 @@
                         <dependency>
                             <groupId>org.connectopensource</groupId>
                             <artifactId>CONNECTCommonTypesLib</artifactId>
-                            <version>4.0.7</version>
+                            <version>4.0.7.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.connectopensource</groupId>
@@ -73,8 +73,8 @@
                             <value>DBPort=${db.port}</value>
                             <value>DBUser=${db.user}</value>
                             <value>ASUsername=${as.username}</value>
-			    <value>ASPassword=${as.password}</value>
-			    <value>JMXHost=${jmx.host}</value>
+                <value>ASPassword=${as.password}</value>
+                <value>JMXHost=${jmx.host}</value>
                             <value>JMXPort=${jmx.port}</value>      
                         </projectProperties>
                     </configuration>

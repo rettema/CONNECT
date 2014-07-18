@@ -21,7 +21,7 @@
         <plugins>
             <plugin>
                 <groupId>com.github.redfish4ktc.soapui</groupId>
-		<artifactId>maven-soapui-extension-plugin</artifactId>
+        <artifactId>maven-soapui-extension-plugin</artifactId>
                 <version>4.5.1.2</version>
                     <dependencies>
                         <dependency>
@@ -32,7 +32,7 @@
                         <dependency>
                             <groupId>org.connectopensource</groupId>
                             <artifactId>CONNECTCommonTypesLib</artifactId>
-                            <version>4.0.7</version>
+                            <version>4.0.7.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.connectopensource</groupId>
