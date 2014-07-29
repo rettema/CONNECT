@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="gov.hhs.fha.nhinc.subscription.repository.data">
+  <class name="NotificationStorageItem" table="notification">
+    <id column="id" name="id" type="long">
+      <generator class="increment"/>
+    </id>
+    <property column="subscriptionId" name="subscriptionId" not-null="true" type="long"/>
+    <property column="notificationStatus" length="45" name="notificationStatus" not-null="false" type="string"/>
+    <property column="topic" length="255" name="topic" not-null="false" type="string"/>
+    <property column="dialect" length="255" name="dialect" not-null="false" type="string"/>
+    <property column="fileName" length="255" name="fileName" not-null="false" type="string"/>
+    <property column="notificationTime" length="64" name="notificationTime" not-null="false" type="timestamp"/>
+    <property column="notificationMessage" name="notificationMessage" not-null="false" type="string"/>
+    <property column="acknowledgementMessage" name="acknowledgementMessage" not-null="false" type="string"/>
+  </class>
+</hibernate-mapping>

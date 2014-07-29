@@ -1,69 +1,49 @@
 /*
- * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services. 
- * All rights reserved. 
+ * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services.
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
- *     * Redistributions of source code must retain the above 
- *       copyright notice, this list of conditions and the following disclaimer. 
- *     * Redistributions in binary form must reproduce the above copyright 
- *       notice, this list of conditions and the following disclaimer in the documentation 
- *       and/or other materials provided with the distribution. 
- *     * Neither the name of the United States Government nor the 
- *       names of its contributors may be used to endorse or promote products 
- *       derived from this software without specific prior written permission. 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the documentation
+ *       and/or other materials provided with the distribution.
+ *     * Neither the name of the United States Government nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY 
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND 
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package gov.hhs.fha.nhinc.subscription.repository.roottopicextractor;
 
-//import java.io.ByteArrayOutputStream;
 import gov.hhs.fha.nhinc.subscription.repository.dialectalgorithms.concrete.ConcreteDialectRootTopicExtractor;
 import gov.hhs.fha.nhinc.subscription.repository.dialectalgorithms.full.FullDialectRootTopicExtractor;
 import gov.hhs.fha.nhinc.subscription.repository.dialectalgorithms.simple.SimpleDialectRootTopicExtractor;
 import gov.hhs.fha.nhinc.subscription.repository.service.SubscriptionRepositoryException;
 import gov.hhs.fha.nhinc.xmlCommon.XmlUtility;
+import gov.hhs.fha.nhinc.xmlCommon.XpathHelper;
 
 import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.apache.log4j.Logger;
-//import java.io.IOException;
-//import javax.xml.parsers.ParserConfigurationException;
-//import javax.xml.xpath.XPathConstants;
-//import org.apache.xml.serialize.OutputFormat;
-//import org.apache.xml.serialize.XMLSerializer;
-//import org.w3c.dom.DOMException;
-//import org.w3c.dom.ls.LSException;
-//import org.xml.sax.InputSource;
-//import java.io.ByteArrayInputStream;
-//import org.w3c.dom.DOMConfiguration;
-//import java.io.StringReader;
-//import javax.xml.namespace.QName;
-//import javax.xml.parsers.DocumentBuilder;
-//import javax.xml.parsers.DocumentBuilderFactory;
-//import org.w3c.dom.Document;
-//import org.w3c.dom.bootstrap.DOMImplementationRegistry;
-//import org.w3c.dom.ls.DOMImplementationLS;
-//import org.w3c.dom.ls.LSInput;
-//import org.w3c.dom.ls.LSParser;
-//import org.w3c.dom.ls.LSSerializer;
-//import org.xml.sax.SAXException;
 
 /**
- * 
- * 
+ * Oasis topic extraction conversion
+ *
  * @author Neil Webb
+ * @author richard.ettema
  */
 public class RootTopicExtractor {
 
@@ -76,7 +56,7 @@ public class RootTopicExtractor {
     private static final Logger LOG = Logger.getLogger(RootTopicExtractor.class);
 
     public String extractRootTopicFromSubscribeElement(Element subscribeElement) throws SubscriptionRepositoryException {
-        // TODO: Root topic extraction strategy
+        // Root topic extraction strategy
         String rootTopic = null;
         if (subscribeElement != null) {
             try {
@@ -113,7 +93,7 @@ public class RootTopicExtractor {
 
     public String extractRootTopicFromNotificationMessageElement(Element notificationMessageElement)
             throws SubscriptionRepositoryException {
-        // TODO: Root topic extraction strategy
+        // Root topic extraction strategy
         String rootTopic = null;
         if (notificationMessageElement != null) {
             try {
@@ -207,7 +187,7 @@ public class RootTopicExtractor {
             throws XPathExpressionException {
         String xpathQuery = "//*[local-name()='Subscribe']/*[local-name()='Filter']/*[local-name()='TopicExpression']";
 
-        Element topicExpressionElement = (Element) XmlUtility.performXpathQuery(subscribeElement, xpathQuery);
+        Element topicExpressionElement = (Element) XpathHelper.performXpathQuery(subscribeElement, xpathQuery);
         if (topicExpressionElement == null) {
             LOG.info("subscribe does not have topic expression node.  Will check for reverse compat");
             RootTopicExtractorReverseCompat compat = new RootTopicExtractorReverseCompat();
@@ -217,16 +197,16 @@ public class RootTopicExtractor {
         return topicExpressionElement;
     }
 
-    private Element extractTopicElementFromNotificationMessageXml(String notificationMessageXml)
+    public Element extractTopicElementFromNotificationMessageXml(String notificationMessageXml)
             throws XPathExpressionException {
         String xpathQuery = "//*[local-name()='NotificationMessage']/*[local-name()='Topic']";
-        return (Element) XmlUtility.performXpathQuery(notificationMessageXml, xpathQuery);
+        return (Element) XpathHelper.performXpathQuery(notificationMessageXml, xpathQuery);
     }
 
     public Element extractTopicElementFromNotificationMessageElement(Element notificationMessageElement)
             throws XPathExpressionException {
         String xpathQuery = "//*[local-name()='NotificationMessage']/*[local-name()='Topic']";
-        Element topicElement = (Element) XmlUtility.performXpathQuery(notificationMessageElement, xpathQuery);
+        Element topicElement = (Element) XpathHelper.performXpathQuery(notificationMessageElement, xpathQuery);
 
         if (topicElement == null) {
             LOG.info("notify does not have topic node.  Will check for reverse compat");
@@ -236,4 +216,5 @@ public class RootTopicExtractor {
         return topicElement;
 
     }
+
 }

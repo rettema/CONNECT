@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+">
+
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+    <context:annotation-config />
+    
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:hiem.properties</value>
+                <value>file:///${nhinc.properties.dir}/gateway.properties</value>
+                <value>classpath:hiem-test.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Notify -->
+    <bean id="HiemNotifyBean" class="gov.hhs.fha.nhinc.hiem._20.notify.nhin.HiemNotify">
+        <property name="inboundHiemNotify">
+            <bean class="${hiem.inboundHiemNotify}" />
+        </property>
+    </bean>
+
+    <bean id="EntityNotifySecuredBean" class="gov.hhs.fha.nhinc.hiem._20.notify.entity.EntityNotifySecured">
+        <property name="outboundHiemNotify">
+            <bean class="${hiem.outboundHiemNotify}" />
+        </property>
+    </bean>
+
+    <bean id="EntityNotifyServiceBean" class="gov.hhs.fha.nhinc.hiem._20.notify.entity.EntityNotifyService">
+        <property name="outboundHiemNotify">
+            <bean class="${hiem.outboundHiemNotify}" />
+        </property>
+    </bean>
+
+    <!-- Subscribe -->
+    <bean id="HiemSubscribeBean" class="gov.hhs.fha.nhinc.hiem._20.subscribe.nhin.HiemSubscribe">
+        <property name="inboundHiemSubscribe">
+            <bean class="${hiem.inboundHiemSubscribe}" />
+        </property>
+    </bean>
+
+    <bean id="EntitySubscribeSecuredServiceBean" class="gov.hhs.fha.nhinc.hiem._20.subscribe.entity.EntitySubscribeSecuredService">
+        <property name="outboundHiemSubscribe">
+            <bean class="${hiem.outboundHiemSubscribe}" />
+        </property>
+    </bean>
+
+    <bean id="EntitySubscribeServiceBean" class="gov.hhs.fha.nhinc.hiem._20.subscribe.entity.EntitySubscribeService">
+        <property name="outboundHiemSubscribe">
+            <bean class="${hiem.outboundHiemSubscribe}" />
+        </property>
+    </bean>
+
+    <!-- Unsubscribe -->
+    <bean id="HiemUnsubscribeBean" class="gov.hhs.fha.nhinc.hiem._20.unsubscribe.nhin.HiemUnsubscribe">
+        <property name="inboundHiemUnsubscribe">
+            <bean class="${hiem.inboundHiemUnsubscribe}" />
+        </property>
+    </bean>
+
+    <bean id="EntityUnsubscribeSecuredServiceBean" class="gov.hhs.fha.nhinc.hiem._20.unsubscribe.entity.EntityUnsubscribeSecuredService">
+        <property name="outboundHiemUnsubscribe">
+            <bean class="${hiem.outboundHiemUnsubscribe}" />
+        </property>
+    </bean>
+
+    <bean id="EntityUnsubscribeServiceBean" class="gov.hhs.fha.nhinc.hiem._20.unsubscribe.entity.EntityUnsubscribeService">
+        <property name="outboundHiemUnsubscribe">
+            <bean class="${hiem.outboundHiemUnsubscribe}" />
+        </property>
+    </bean>
+
+    <!-- Handlers -->
+    <bean id="HIEMSoapHeaderHandler" class="gov.hhs.fha.nhinc.hiem.header.HIEMSoapHeaderHandler" />
+    <bean id="TransactionHandler" class="gov.hhs.fha.nhinc.logging.transaction.TransactionHandler" />
+</beans>

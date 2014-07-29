@@ -36,6 +36,7 @@ import org.uddi.api_v3.BusinessEntity;
 
 import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
 import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetCommunitiesType;
+import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetCommunityType;
 import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType;
 import gov.hhs.fha.nhinc.common.nhinccommon.UserType;
 import gov.hhs.fha.nhinc.connectmgr.ConnectionManagerCache;
@@ -53,6 +54,7 @@ import gov.hhs.fha.nhinc.properties.PropertyAccessor;
  *
  * @author Les Westberg
  * @author venkat.keesara
+ * @author richard.ettema
  */
 public class HomeCommunityMap {
 
@@ -109,6 +111,21 @@ public class HomeCommunityMap {
     }
 
     /**
+     * This method retrieves the home community id from the target home community.
+     *
+     * @param target
+     * @return The home community OID string
+     */
+    public static String getCommunityIdFromTargetCommunity(NhinTargetCommunityType target) {
+        String responseCommunityId = null;
+        if (target != null && target.getHomeCommunity() != null) {
+            responseCommunityId = target.getHomeCommunity().getHomeCommunityId();
+        }
+        LOG.debug("=====>>>>> responseCommunityId is " + responseCommunityId);
+        return formatHomeCommunityId(responseCommunityId);
+    }
+
+    /**
      * This method retrieves the home community id from the target home system.
      *
      * @param target
@@ -144,13 +161,13 @@ public class HomeCommunityMap {
                 }
             }
         }
-        
+
         if (communityId == null){
         	communityId = getHomeCommunityIdFromAssertion(assertion);
         }
         return formatHomeCommunityId(communityId);
     }
-    
+
     /**
      * This method retrieves the home community id from the homeCommunityId property of
      * the assertion.
@@ -236,7 +253,7 @@ public class HomeCommunityMap {
      */
     public static String formatHomeCommunityId(String communityId) {
         if (communityId != null) {
-            LOG.debug("communityId prior to remove urn:oid" + communityId);
+            LOG.debug("communityId prior to remove 'urn:oid:' = " + communityId);
             if (communityId.startsWith("urn:oid:")) {
                 communityId = communityId.substring(8);
             }
@@ -269,7 +286,7 @@ public class HomeCommunityMap {
      */
     public static String getHomeCommunityIdWithPrefix(String communityId) {
         if (communityId != null) {
-            LOG.debug("communityId prior to adding urn:oid" + communityId);
+            LOG.debug("communityId prior to adding 'urn:oid:' = " + communityId);
             if (!communityId.startsWith("urn:oid:")) {
                 communityId = "urn:oid:"+communityId;
             }

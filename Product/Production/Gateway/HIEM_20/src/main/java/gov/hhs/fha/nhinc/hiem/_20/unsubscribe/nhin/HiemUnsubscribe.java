@@ -26,37 +26,59 @@
  */
 package gov.hhs.fha.nhinc.hiem._20.unsubscribe.nhin;
 
+import gov.hhs.fha.nhinc.aspect.InboundMessageEvent;
+import gov.hhs.fha.nhinc.unsubscribe.aspect.UnsubscribeRequestTransformingBuilder;
+import gov.hhs.fha.nhinc.unsubscribe.aspect.UnsubscribeResponseDescriptionBuilder;
+import gov.hhs.fha.nhinc.unsubscribe.inbound.InboundHiemUnsubscribe;
+
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.soap.Addressing;
 
+import org.oasis_open.docs.wsn.b_2.Unsubscribe;
 import org.oasis_open.docs.wsn.b_2.UnsubscribeResponse;
 import org.oasis_open.docs.wsn.bw_2.UnableToDestroySubscriptionFault;
 
 /**
+ * HIEM Nhin Unsubscribe Secured Interface
  *
  * @author Neil Webb
+ * @author richard.ettema
  */
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.SubscriptionManager")
 @BindingType(value = javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 @Addressing(enabled = true)
 public class HiemUnsubscribe {
-    @Resource
-    private WebServiceContext context;
-    private HiemUnsubscribeImpl hiemUnsubscribeImpl;
 
-    public UnsubscribeResponse unsubscribe(
-            org.oasis_open.docs.wsn.b_2.Unsubscribe unsubscribeRequest) throws UnableToDestroySubscriptionFault {
+    private InboundHiemUnsubscribe inboundHiemUnsubscribe;
+
+    private WebServiceContext context;
+
+    /**
+     *
+     * @param unsubscribeRequest
+     * @return
+     * @throws UnableToDestroySubscriptionFault
+     */
+    @InboundMessageEvent(beforeBuilder = UnsubscribeRequestTransformingBuilder.class,
+            afterReturningBuilder = UnsubscribeResponseDescriptionBuilder.class, serviceType = "HIEM Unsubscribe",
+            version = "2.0")
+    public UnsubscribeResponse unsubscribe(Unsubscribe unsubscribeRequest) throws UnableToDestroySubscriptionFault {
+
+        HiemUnsubscribeImpl hiemUnsubscribeImpl = new HiemUnsubscribeImpl(inboundHiemUnsubscribe);
+
         return hiemUnsubscribeImpl.unsubscribe(unsubscribeRequest, context);
     }
 
-    /**
-     * @param hiemUnsubscribeImpl the hiemUnsubscribeImpl to set
-     */
-    public void setHiemUnsubscribeImpl(HiemUnsubscribeImpl hiemUnsubscribeImpl) {
-        this.hiemUnsubscribeImpl = hiemUnsubscribeImpl;
+    public void setInboundHiemUnsubscribe(InboundHiemUnsubscribe inboundHiemUnsubscribe) {
+        this.inboundHiemUnsubscribe = inboundHiemUnsubscribe;
+    }
+
+    @Resource
+    public void setContext(WebServiceContext context) {
+        this.context = context;
     }
 
 }

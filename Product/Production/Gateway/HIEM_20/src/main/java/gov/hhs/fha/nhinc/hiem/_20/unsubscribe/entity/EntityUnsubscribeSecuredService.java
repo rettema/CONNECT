@@ -26,39 +26,59 @@
  */
 package gov.hhs.fha.nhinc.hiem._20.unsubscribe.entity;
 
+import gov.hhs.fha.nhinc.aspect.OutboundMessageEvent;
+import gov.hhs.fha.nhinc.common.nhinccommonentity.UnsubscribeRequestType;
+import gov.hhs.fha.nhinc.unsubscribe.aspect.UnsubscribeRequestTransformingBuilder;
+import gov.hhs.fha.nhinc.unsubscribe.aspect.UnsubscribeResponseDescriptionBuilder;
+import gov.hhs.fha.nhinc.unsubscribe.outbound.OutboundHiemUnsubscribe;
+
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.soap.Addressing;
 
-import org.oasis_open.docs.wsn.b_2.Unsubscribe;
 import org.oasis_open.docs.wsn.b_2.UnsubscribeResponse;
-
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.UnableToDestroySubscriptionFault;
-import gov.hhs.fha.nhinc.unsubscribe.entity.EntityUnsubscribeOrchImpl;
+import org.oasis_open.docs.wsn.bw_2.UnableToDestroySubscriptionFault;
 
 /**
+ * HIEM Entity Unsubscribe Secured Interface
  *
  * @author Neil Webb
+ * @author richard.ettema
  */
-@WebService(
-        endpointInterface = "gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.EntitySubscriptionManagerSecuredPortType")
+@WebService(endpointInterface = "gov.hhs.fha.nhinc.entitysubscription.EntitySubscriptionManagerSecured")
+@Addressing(enabled = true)
 @BindingType(value = javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class EntityUnsubscribeSecuredService {
-    @Resource
-    private WebServiceContext context;
-    private EntityUnsubscribeOrchImpl orchImpl;
 
-    public UnsubscribeResponse unsubscribe(Unsubscribe unsubscribeRequestSecured)
-            throws UnableToDestroySubscriptionFault, Exception {
-        return new EntityUnsubscribeServiceImpl(orchImpl).unsubscribe(unsubscribeRequestSecured, context);
-    }
+    private OutboundHiemUnsubscribe outboundHiemUnsubscribe;
+
+    private WebServiceContext context;
 
     /**
-     * @param orchImpl the orchImpl to set
+     * @param unsubscribeRequestSecured
+     * @return
+     * @throws UnableToDestroySubscriptionFault
+     * @throws Exception
      */
-    public void setOrchestratorImpl(EntityUnsubscribeOrchImpl orchImpl) {
-        this.orchImpl = orchImpl;
+    @OutboundMessageEvent(beforeBuilder = UnsubscribeRequestTransformingBuilder.class,
+            afterReturningBuilder = UnsubscribeResponseDescriptionBuilder.class, serviceType = "HIEM Unsubscribe",
+            version = "2.0")
+    public UnsubscribeResponse unsubscribe(UnsubscribeRequestType unsubscribeRequest) throws UnableToDestroySubscriptionFault {
+
+        EntityUnsubscribeServiceImpl serviceImpl = new EntityUnsubscribeServiceImpl(outboundHiemUnsubscribe);
+
+        return serviceImpl.unsubscribe(unsubscribeRequest, context);
+    }
+
+    public void setOutboundHiemUnsubscribe(OutboundHiemUnsubscribe outboundHiemUnsubscribe) {
+        this.outboundHiemUnsubscribe = outboundHiemUnsubscribe;
+    }
+
+    @Resource
+    public void setContext(WebServiceContext context) {
+        this.context = context;
     }
 
 }

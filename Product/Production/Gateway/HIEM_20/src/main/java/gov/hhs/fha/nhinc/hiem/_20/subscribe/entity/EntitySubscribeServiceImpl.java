@@ -28,132 +28,59 @@ package gov.hhs.fha.nhinc.hiem._20.subscribe.entity;
 
 import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
 import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetCommunitiesType;
-import gov.hhs.fha.nhinc.common.nhinccommonentity.SubscribeDocumentRequestSecuredType;
-import gov.hhs.fha.nhinc.common.nhinccommonentity.SubscribeDocumentRequestType;
-import gov.hhs.fha.nhinc.common.nhinccommonentity.SubscribeDocumentResponseType;
-import gov.hhs.fha.nhinc.cxf.extraction.SAML2AssertionExtractor;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.InvalidFilterFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.InvalidMessageContentExpressionFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.InvalidProducerPropertiesExpressionFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.InvalidTopicExpressionFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.NotifyMessageNotSupportedFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.SubscribeCreationFailedFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.TopicExpressionDialectUnknownFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.TopicNotSupportedFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.UnacceptableInitialTerminationTimeFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.UnrecognizedPolicyRequestFault;
-import gov.hhs.fha.nhinc.entitysubscriptionmanagementsecured.UnsupportedPolicyRequestFault;
-import gov.hhs.fha.nhinc.subscribe.entity.EntitySubscribeOrchImpl;
+import gov.hhs.fha.nhinc.common.nhinccommonentity.SubscribeRequestType;
+import gov.hhs.fha.nhinc.messaging.server.BaseService;
+import gov.hhs.fha.nhinc.subscribe.outbound.OutboundHiemSubscribe;
 
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.log4j.Logger;
 import org.oasis_open.docs.wsn.b_2.Subscribe;
 import org.oasis_open.docs.wsn.b_2.SubscribeResponse;
+import org.oasis_open.docs.wsn.bw_2.InvalidTopicExpressionFault;
+import org.oasis_open.docs.wsn.bw_2.SubscribeCreationFailedFault;
+import org.oasis_open.docs.wsn.bw_2.TopicNotSupportedFault;
 
 /**
- *
+ * HIEM Entity Subscribe Service Implementation
  *
  * @author Neil Webb
+ * @author richard.ettema
  */
-public class EntitySubscribeServiceImpl {
+public class EntitySubscribeServiceImpl extends BaseService {
 
     private static final Logger LOG = Logger.getLogger(EntitySubscribeServiceImpl.class);
 
-    private EntitySubscribeOrchImpl orchImpl;
-    
-    public EntitySubscribeServiceImpl(EntitySubscribeOrchImpl orchImpl){
-    	this.orchImpl = orchImpl;
-    }
-    
-    public SubscribeDocumentResponseType subscribeDocument(SubscribeDocumentRequestType arg0) {
-        // TODO implement this method
-        throw new UnsupportedOperationException("Not implemented yet.");
+    private OutboundHiemSubscribe outboundHiemSubscribe;
+
+    public EntitySubscribeServiceImpl(OutboundHiemSubscribe outboundHiemSubscribe) {
+        this.outboundHiemSubscribe = outboundHiemSubscribe;
     }
 
-    public SubscribeDocumentResponseType subscribeDocument(SubscribeDocumentRequestSecuredType arg0) {
-        // TODO implement this method
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
+    /**
+     * @param subscribeRequest
+     * @param context
+     * @return
+     * @throws TopicNotSupportedFault
+     * @throws InvalidTopicExpressionFault
+     * @throws SubscribeCreationFailedFault
+     */
+    public SubscribeResponse subscribe(SubscribeRequestType subscribeRequest, WebServiceContext context)
+            throws TopicNotSupportedFault, InvalidTopicExpressionFault, SubscribeCreationFailedFault {
 
-    public gov.hhs.fha.nhinc.common.nhinccommonentity.SubscribeCdcBioPackageResponseType subscribeCdcBioPackage(
-            gov.hhs.fha.nhinc.common.nhinccommonentity.SubscribeCdcBioPackageRequestType subscribeCdcBioPackageRequest) {
-        // TODO implement this method
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
+        LOG.debug("Begin EntitySubscribeServiceImpl.subscribe");
 
-    public org.oasis_open.docs.wsn.b_2.SubscribeResponse subscribe(
-            gov.hhs.fha.nhinc.common.nhinccommonentity.SubscribeRequestSecuredType subscribeRequest,
-            WebServiceContext context) throws InvalidFilterFault, InvalidMessageContentExpressionFault,
-            InvalidProducerPropertiesExpressionFault, InvalidTopicExpressionFault, NotifyMessageNotSupportedFault,
-            SubscribeCreationFailedFault, TopicExpressionDialectUnknownFault,
-            TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault, UnrecognizedPolicyRequestFault,
-            UnsupportedPolicyRequestFault {
-        LOG.debug("In subscribe");
-
-        AssertionType assertion = SAML2AssertionExtractor.getInstance().extractSamlAssertion(context);
-
-        Subscribe subscribe = subscribeRequest.getSubscribe();
-        NhinTargetCommunitiesType targetCommunitites = subscribeRequest.getNhinTargetCommunities();
-
-        SubscribeResponse response = null;
-        try {
-            response = subscribe(subscribe, assertion, targetCommunitites);
-        } catch (org.oasis_open.docs.wsn.bw_2.TopicNotSupportedFault ex) {
-            throw new TopicNotSupportedFault(ex.getMessage(), ex.getFaultInfo(), ex.getCause());
-        } catch (org.oasis_open.docs.wsn.bw_2.InvalidTopicExpressionFault ex) {
-            throw new InvalidTopicExpressionFault(ex.getMessage(), ex.getFaultInfo(), ex.getCause());
-        } catch (org.oasis_open.docs.wsn.bw_2.SubscribeCreationFailedFault ex) {
-            throw new SubscribeCreationFailedFault(ex.getMessage(), ex.getFaultInfo(), ex.getCause());
-        } 
-
-        LOG.debug("Exiting ProxyHiemUnsubscribeImpl.unsubscribe...");
-        return response;
-    }
-
-    public org.oasis_open.docs.wsn.b_2.SubscribeResponse subscribe(
-            gov.hhs.fha.nhinc.common.nhinccommonentity.SubscribeRequestType subscribeRequest, WebServiceContext context)
-                    throws gov.hhs.fha.nhinc.entitysubscriptionmanagement.TopicNotSupportedFault,
-                    gov.hhs.fha.nhinc.entitysubscriptionmanagement.InvalidTopicExpressionFault,
-                    gov.hhs.fha.nhinc.entitysubscriptionmanagement.SubscribeCreationFailedFault {
-        LOG.debug("In subscribe");
-        
         AssertionType assertion = subscribeRequest.getAssertion();
 
         Subscribe subscribe = subscribeRequest.getSubscribe();
+
         NhinTargetCommunitiesType targetCommunitites = subscribeRequest.getNhinTargetCommunities();
 
-        SubscribeResponse response = null;
-        try {
-            response = subscribe(subscribe, assertion, targetCommunitites);
-        } catch (org.oasis_open.docs.wsn.bw_2.TopicNotSupportedFault ex) {
-            throw new gov.hhs.fha.nhinc.entitysubscriptionmanagement.TopicNotSupportedFault(ex.getMessage(),
-                    ex.getFaultInfo(), ex.getCause());
-        } catch (org.oasis_open.docs.wsn.bw_2.InvalidTopicExpressionFault ex) {
-            throw new gov.hhs.fha.nhinc.entitysubscriptionmanagement.InvalidTopicExpressionFault(ex.getMessage(),
-                    ex.getFaultInfo(), ex.getCause());
-        } catch (org.oasis_open.docs.wsn.bw_2.SubscribeCreationFailedFault ex) {
-            throw new gov.hhs.fha.nhinc.entitysubscriptionmanagement.SubscribeCreationFailedFault(ex.getMessage(),
-                    ex.getFaultInfo(), ex.getCause());
-        }
+        SubscribeResponse response = outboundHiemSubscribe.processSubscribe(subscribe, assertion, targetCommunitites);
+
+        LOG.debug("End EntitySubscribeServiceImpl.subscribe");
+
         return response;
     }
 
-    private org.oasis_open.docs.wsn.b_2.SubscribeResponse subscribe(Subscribe subscribe,
-            AssertionType assertion, NhinTargetCommunitiesType targetCommunitites)
-                    throws org.oasis_open.docs.wsn.bw_2.TopicNotSupportedFault,
-                    org.oasis_open.docs.wsn.bw_2.InvalidTopicExpressionFault,
-                    org.oasis_open.docs.wsn.bw_2.SubscribeCreationFailedFault {
-        SubscribeResponse response = null;
-        response = getOrchImpl().processSubscribe(subscribe, assertion, targetCommunitites);
-        return response;
-    }
-    
-    /**
-    * return the orchImpl object.
-    * @return
-    */
-    protected EntitySubscribeOrchImpl getOrchImpl(){
-    	return this.orchImpl;
-    }
 }

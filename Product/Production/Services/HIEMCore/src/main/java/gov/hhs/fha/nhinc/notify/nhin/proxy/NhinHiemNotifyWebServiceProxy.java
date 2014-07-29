@@ -26,6 +26,7 @@
  */
 package gov.hhs.fha.nhinc.notify.nhin.proxy;
 
+import gov.hhs.fha.nhinc.aspect.NwhinInvocationEvent;
 import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
 import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType;
 import gov.hhs.fha.nhinc.connectmgr.ConnectionManagerCache;
@@ -37,6 +38,8 @@ import gov.hhs.fha.nhinc.messaging.service.port.ServicePortDescriptor;
 import gov.hhs.fha.nhinc.nhinclib.NhincConstants;
 import gov.hhs.fha.nhinc.nhinclib.NhincConstants.GATEWAY_API_LEVEL;
 import gov.hhs.fha.nhinc.nhinclib.NullChecker;
+import gov.hhs.fha.nhinc.notify.aspect.NotifyRequestTransformingBuilder;
+import gov.hhs.fha.nhinc.notify.aspect.NotifyResponseDescriptionBuilder;
 import gov.hhs.fha.nhinc.notify.nhin.proxy.service.NhinHiemNotifyServicePortDescriptor;
 import gov.hhs.fha.nhinc.webserviceproxy.WebServiceProxyHelper;
 
@@ -47,22 +50,28 @@ import org.oasis_open.docs.wsn.b_2.Notify;
 import org.oasis_open.docs.wsn.bw_2.NotificationConsumer;
 
 /**
- * 
+ *
  * @author Jon Hoppesch
+ * @author richard.ettema
  */
 public class NhinHiemNotifyWebServiceProxy implements NhinHiemNotifyProxy {
 
     private static final Logger LOG = Logger.getLogger(NhinHiemNotifyWebServiceProxy.class);
 
     protected CONNECTClient<NotificationConsumer> getCONNECTClientSecured(
-            ServicePortDescriptor<NotificationConsumer> portDescriptor, String url, AssertionType assertion,
-            String wsAddressingTo) {
+            ServicePortDescriptor<NotificationConsumer> portDescriptor, String url, AssertionType assertion) {
 
         return CONNECTCXFClientFactory.getInstance().getCONNECTClientSecured(portDescriptor, url, assertion,
-                wsAddressingTo, null);
+                null);
     }
 
+    /* (non-Javadoc)
+     * @see gov.hhs.fha.nhinc.notify.nhin.proxy.NhinHiemNotifyProxy#notify(org.oasis_open.docs.wsn.b_2.Notify, gov.hhs.fha.nhinc.hiem.consumerreference.SoapMessageElements, gov.hhs.fha.nhinc.common.nhinccommon.AssertionType, gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType)
+     */
     @Override
+    @NwhinInvocationEvent(beforeBuilder = NotifyRequestTransformingBuilder.class,
+        afterReturningBuilder = NotifyResponseDescriptionBuilder.class, serviceType = "HIEM Notify",
+        version = "2.0")
     public void notify(Notify notify, SoapMessageElements referenceParametersElements, AssertionType assertion,
             NhinTargetSystemType target) {
 
@@ -82,20 +91,19 @@ public class NhinHiemNotifyWebServiceProxy implements NhinHiemNotifyProxy {
 
                 NhinHiemNotifyServicePortDescriptor portDescriptor = new NhinHiemNotifyServicePortDescriptor();
 
-                CONNECTClient<NotificationConsumer> client = getCONNECTClientSecured(portDescriptor, url, assertion,
-                        wsAddressingTo);
+                CONNECTClient<NotificationConsumer> client = getCONNECTClientSecured(portDescriptor, wsAddressingTo, assertion);
 
-                WebServiceProxyHelper wsHelper = new WebServiceProxyHelper();                
+                WebServiceProxyHelper wsHelper = new WebServiceProxyHelper();
                 wsHelper.addTargetCommunity((BindingProvider) client.getPort(), target);
                 wsHelper.addTargetApiLevel((BindingProvider) client.getPort(), GATEWAY_API_LEVEL.LEVEL_g0);
-                wsHelper.addServiceName((BindingProvider) client.getPort(), 
-                        NhincConstants.HIEM_NOTIFY_SERVICE_NAME);
+                wsHelper.addServiceName((BindingProvider) client.getPort(), NhincConstants.HIEM_NOTIFY_SERVICE_NAME);
 
-                
                 client.invokePort(NotificationConsumer.class, "notify", notify);
             }
+
         } catch (Throwable t) {
             LOG.error("Error sending notify to remote gateway: " + t.getMessage(), t);
         }
     }
+
 }

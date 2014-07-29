@@ -1,28 +1,28 @@
 /*
- * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services. 
- * All rights reserved. 
+ * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services.
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
- *     * Redistributions of source code must retain the above 
- *       copyright notice, this list of conditions and the following disclaimer. 
- *     * Redistributions in binary form must reproduce the above copyright 
- *       notice, this list of conditions and the following disclaimer in the documentation 
- *       and/or other materials provided with the distribution. 
- *     * Neither the name of the United States Government nor the 
- *       names of its contributors may be used to endorse or promote products 
- *       derived from this software without specific prior written permission. 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the documentation
+ *       and/or other materials provided with the distribution.
+ *     * Neither the name of the United States Government nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY 
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND 
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package gov.hhs.fha.nhinc.subscription.repository.service;
 
@@ -31,34 +31,46 @@ import gov.hhs.fha.nhinc.nhinclib.NullChecker;
 import gov.hhs.fha.nhinc.subscription.repository.dao.SubscriptionStorageItemDao;
 import gov.hhs.fha.nhinc.subscription.repository.data.SubscriptionStorageItem;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * SubscriptionStorageItem persistence service
- * 
+ *
  * NOTE: Do not access this class directly. Use the SubscriptionItemService instead.
- * 
+ *
  * @author Neil Webb
+ * @author richard.ettema
  */
 public class SubscriptionStorageItemService {
 
     /**
      * Save a subscription storage item
-     * 
+     *
      * @param subscriptionItem Object to save
      */
     public void save(SubscriptionStorageItem subscriptionItem) {
         SubscriptionStorageItemDao dao = new SubscriptionStorageItemDao();
-        if ((subscriptionItem != null) && (subscriptionItem.getSubscriptionId() == null)) {
-            // subscriptionItem.setSubscriptionId(generateSubscriptionId());
-            // TODO: Set subscription reference
-        }
         dao.save(subscriptionItem);
     }
 
     /**
+     * Retrieve subscription storage items by basic search criteria
+     *
+     * @param startCreationDate
+     * @param stopCreationDate
+     * @param subscriptionRole
+     * @param subscriptionStatus
+     * @return Retrieved subscriptions
+     */
+    public List<SubscriptionStorageItem> findByCriteria(Date startCreationDate, Date stopCreationDate, String subscriptionRole, String subscriptionStatus) {
+        SubscriptionStorageItemDao dao = new SubscriptionStorageItemDao();
+        return dao.findByCriteria(startCreationDate, stopCreationDate, subscriptionRole, subscriptionStatus);
+    }
+
+    /**
      * Retrieve a subscription storage item by identifier
-     * 
+     *
      * @param subscriptionId Subscription identifier
      * @return Retrieved subscription
      */
@@ -69,7 +81,7 @@ public class SubscriptionStorageItemService {
 
     /**
      * Retrieve a subscription storage item by subscription identifier
-     * 
+     *
      * @param subscriptionId Subscription identifier
      * @return Retrieved subscriptions
      */
@@ -78,9 +90,14 @@ public class SubscriptionStorageItemService {
         return dao.findBySubscriptionId(subscriptionId);
     }
 
-    public List<SubscriptionStorageItem> findByRootTopic(String rootTopic, String producer) {
+    public List<SubscriptionStorageItem> findBySubscriptionIdRole(String subscriptionId, String subscriptionRole) {
         SubscriptionStorageItemDao dao = new SubscriptionStorageItemDao();
-        return dao.findByRootTopic(rootTopic, producer);
+        return dao.findBySubscriptionIdRole(subscriptionId, subscriptionRole);
+    }
+
+    public List<SubscriptionStorageItem> findByRootTopic(String rootTopic, String subscriptionRole) {
+        SubscriptionStorageItemDao dao = new SubscriptionStorageItemDao();
+        return dao.findByRootTopic(rootTopic, subscriptionRole);
     }
 
     public List<SubscriptionStorageItem> findByProducer(String producer) {
@@ -90,7 +107,7 @@ public class SubscriptionStorageItemService {
 
     /**
      * Retrieve a subscription storage item by parent subscription identifier
-     * 
+     *
      * @param parentSubscriptionId Parent subscription identifier
      * @return Retrieved subscriptions
      */
@@ -139,7 +156,7 @@ public class SubscriptionStorageItemService {
      * Retrieve subscriptions from parent subscription reference. The parent subscription reference will always be
      * generated by this system so efficient matching may be performed by extracting the subscription id. No support for
      * a variant form of subscription reference is required.
-     * 
+     *
      * @param parentSubscriptionReferenceXML Parent subscription reference
      * @return Matching subscriptions
      * @throws SubscriptionRepositoryException
@@ -166,7 +183,7 @@ public class SubscriptionStorageItemService {
 
     /**
      * Delete a subscription storage item
-     * 
+     *
      * @param subscriptionItem Subscription storage item to delete
      */
     public void delete(SubscriptionStorageItem subscriptionItem) {
@@ -174,15 +191,9 @@ public class SubscriptionStorageItemService {
         dao.delete(subscriptionItem);
     }
 
-    private String generateSubscriptionId() {
-
-        java.rmi.server.UID uid = new java.rmi.server.UID();
-        return uid.toString();
-    }
-
     /**
      * Retrieve the number of subscriptions in the repository.
-     * 
+     *
      * @return Subscription count
      */
     public int subscriptionCount() {
@@ -197,4 +208,5 @@ public class SubscriptionStorageItemService {
         SubscriptionStorageItemDao dao = new SubscriptionStorageItemDao();
         dao.emptyRepository();
     }
+
 }

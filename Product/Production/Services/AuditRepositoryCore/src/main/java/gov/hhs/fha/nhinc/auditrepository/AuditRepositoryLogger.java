@@ -1,28 +1,28 @@
 /*
- * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services. 
- * All rights reserved. 
+ * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services.
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
- *     * Redistributions of source code must retain the above 
- *       copyright notice, this list of conditions and the following disclaimer. 
- *     * Redistributions in binary form must reproduce the above copyright 
- *       notice, this list of conditions and the following disclaimer in the documentation 
- *       and/or other materials provided with the distribution. 
- *     * Neither the name of the United States Government nor the 
- *       names of its contributors may be used to endorse or promote products 
- *       derived from this software without specific prior written permission. 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the documentation
+ *       and/or other materials provided with the distribution.
+ *     * Neither the name of the United States Government nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY 
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND 
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package gov.hhs.fha.nhinc.auditrepository;
 
@@ -39,16 +39,8 @@ import gov.hhs.fha.nhinc.common.auditlog.LogDocRetrieveResultRequestType;
 import gov.hhs.fha.nhinc.common.auditlog.LogEventRequestType;
 import gov.hhs.fha.nhinc.common.auditlog.LogFindAuditEventsRequestType;
 import gov.hhs.fha.nhinc.common.auditlog.LogFindAuditEventsResultRequestType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.EntityCdcNotifyRequestMessageType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.EntityCdcSubscribeRequestMessageType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.EntityDocumentNotifyRequestMessageType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.EntityDocumentSubscribeRequestMessageType;
 import gov.hhs.fha.nhinc.common.hiemauditlog.EntityNotifyResponseMessageType;
 import gov.hhs.fha.nhinc.common.hiemauditlog.EntityUnsubscribeRequestMessageType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.LogEntityCdcNotifyRequestType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.LogEntityCdcSubscribeRequestType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.LogEntityDocumentNotifyRequestType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.LogEntityDocumentSubscribeRequestType;
 import gov.hhs.fha.nhinc.common.hiemauditlog.LogEntityNotifyResponseType;
 import gov.hhs.fha.nhinc.common.hiemauditlog.LogEntityUnsubscribeRequestType;
 import gov.hhs.fha.nhinc.common.hiemauditlog.LogNhinNotifyRequestType;
@@ -89,8 +81,9 @@ import org.hl7.v3.RespondingGatewayPRPAIN201306UV02RequestType;
 import org.hl7.v3.RespondingGatewayPRPAIN201306UV02ResponseType;
 
 /**
- * 
+ *
  * @author Jon Hoppesch
+ * @author richard.ettema
  */
 public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLogger  {
 
@@ -109,7 +102,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a NHIN Patient Discovery Request.
-     * 
+     *
      * @param message The Patient Discovery Request message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -126,7 +119,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a NHIN Patient Discovery Request.
-     * 
+     *
      * @param message The Patient Discovery Request message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -145,7 +138,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a NHIN Patient Discovery Response.
-     * 
+     *
      * @param message The Patient Discovery Response message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -164,7 +157,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an Adapter Patient Discovery Request.
-     * 
+     *
      * @param message The Patient Discovery Request message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -183,7 +176,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an Adapter Patient Discovery Response.
-     * 
+     *
      * @param message The Patient Discovery Response message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -202,7 +195,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an Entity Patient Discovery Request.
-     * 
+     *
      * @param message The Patient Discovery Request message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -221,7 +214,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an Entity Patient Discovery Response.
-     * 
+     *
      * @param message The Patient Discovery Response message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -240,7 +233,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an Entity Patient Discovery Async Response.
-     * 
+     *
      * @param message The Patient Discovery Async Response message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -329,7 +322,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a document query request.
-     * 
+     *
      * @param message The Document Query Request message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -342,7 +335,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a document query request.
-     * 
+     *
      * @param message The Document Query Request message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -364,7 +357,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a document query response.
-     * 
+     *
      * @param message The Document Query Response message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -377,7 +370,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a document query response.
-     * 
+     *
      * @param message The Document Query Response message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -399,7 +392,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a document query deferred acknowledgment.
-     * 
+     *
      * @param acknowledgement The DocQuery Acknowledgment
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -414,7 +407,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a document query deferred acknowledgment.
-     * 
+     *
      * @param acknowledgement The DocQuery Acknowledgment
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -485,7 +478,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an audit query request.
-     * 
+     *
      * @param message The Audit Query Request message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -506,7 +499,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an audit query response.
-     * 
+     *
      * @param message The Audit Query Response message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -527,7 +520,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a Nhin Subscribe request.
-     * 
+     *
      * @param message The Nhin Subscribe Request message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -549,7 +542,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a Nhin notify request.
-     * 
+     *
      * @param message The Nhin Notify Request message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -570,7 +563,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a Nhin unsubscribe request.
-     * 
+     *
      * @param message The Nhin Unsubscribe Request message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -592,7 +585,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an unsubscribe response.
-     * 
+     *
      * @param message The Unsubscribe Response message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -614,7 +607,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from a subscribe response.
-     * 
+     *
      * @param message The Subscribe Response message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -635,92 +628,8 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
     }
 
     /**
-     * This method will create the generic Audit Log Message from an entity document subscribe request.
-     * 
-     * @param message The Entity Document Subscribe Request message to be audit logged.
-     * @param direction The direction this message is going (Inbound or Outbound)
-     * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
-     * @return A generic audit log message that can be passed to the Audit Repository
-     */
-    public LogEventRequestType logEntityDocSubscribeRequest(EntityDocumentSubscribeRequestMessageType message,
-            String direction, String _interface) {
-        LOG.debug("Entering AuditRepositoryLogger.logEntityDocSubscribeRequest(...)");
-        LogEventRequestType auditMsg = null;
-            LogEntityDocumentSubscribeRequestType logReqMsg = new LogEntityDocumentSubscribeRequestType();
-            logReqMsg.setDirection(direction);
-            logReqMsg.setInterface(_interface);
-            logReqMsg.setMessage(message);
-            LOG.warn("logEntityDocSubscribeRequest method is not implemented");
-        LOG.debug("Exiting AuditRepositoryLogger.logEntityDocSubscribeRequest(...)");
-        return auditMsg;
-    }
-
-    /**
-     * This method will create the generic Audit Log Message from an entity CDC subscribe request.
-     * 
-     * @param message The Entity CDC Subscribe Request message to be audit logged.
-     * @param direction The direction this message is going (Inbound or Outbound)
-     * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
-     * @return A generic audit log message that can be passed to the Audit Repository
-     */
-    public LogEventRequestType logEntityCdcSubscribeRequest(EntityCdcSubscribeRequestMessageType message,
-            String direction, String _interface) {
-        LOG.debug("Entering AuditRepositoryLogger.logEntityCdcSubscribeRequest(...)");
-        LogEventRequestType auditMsg = null;
-            LogEntityCdcSubscribeRequestType logReqMsg = new LogEntityCdcSubscribeRequestType();
-            logReqMsg.setDirection(direction);
-            logReqMsg.setInterface(_interface);
-            logReqMsg.setMessage(message);
-            LOG.warn("logEntityCdcSubscribeRequest method is not implemented");
-        LOG.debug("Exiting AuditRepositoryLogger.logEntityCdcSubscribeRequest(...)");
-        return auditMsg;
-    }
-
-    /**
-     * This method will create the generic Audit Log Message from an entity document notify request.
-     * 
-     * @param message The Entity Document Notify Request message to be audit logged.
-     * @param direction The direction this message is going (Inbound or Outbound)
-     * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
-     * @return A generic audit log message that can be passed to the Audit Repository
-     */
-    public LogEventRequestType logEntityDocNotifyRequest(EntityDocumentNotifyRequestMessageType message,
-            String direction, String _interface) {
-        LOG.debug("Entering AuditRepositoryLogger.logEntityDocNotifyRequest(...)");
-        LogEventRequestType auditMsg = null;
-            LogEntityDocumentNotifyRequestType logReqMsg = new LogEntityDocumentNotifyRequestType();
-            logReqMsg.setDirection(direction);
-            logReqMsg.setInterface(_interface);
-            logReqMsg.setMessage(message);
-            LOG.warn("logEntityDocNotifyRequest method is not implemented");
-        LOG.debug("Exiting AuditRepositoryLogger.logEntityDocNotifyRequest(...)");
-        return auditMsg;
-    }
-
-    /**
-     * This method will create the generic Audit Log Message from an entity CDC notify request.
-     * 
-     * @param message The Entity CDC Notify Request message to be audit logged.
-     * @param direction The direction this message is going (Inbound or Outbound)
-     * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
-     * @return A generic audit log message that can be passed to the Audit Repository
-     */
-    public LogEventRequestType logEntityCdcNotifyRequest(EntityCdcNotifyRequestMessageType message, String direction,
-            String _interface) {
-        LOG.debug("Entering AuditRepositoryLogger.logEntityCdcNotifyRequest(...)");
-        LogEventRequestType auditMsg = null;
-            LogEntityCdcNotifyRequestType logReqMsg = new LogEntityCdcNotifyRequestType();
-            logReqMsg.setDirection(direction);
-            logReqMsg.setInterface(_interface);
-            logReqMsg.setMessage(message);
-            LOG.warn("logEntityCdcNotifyRequest method is not implemented");
-        LOG.debug("Exiting AuditRepositoryLogger.logEntityCdcNotifyRequest(...)");
-        return auditMsg;
-    }
-
-    /**
      * This method will create the generic Audit Log Message from an entity notify response.
-     * 
+     *
      * @param message The Entity Notify Response message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -778,7 +687,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
             LOG.error("Message is null");
             return null;
         }
-        
+
         XDRTransforms auditTransformer = new XDRTransforms();
         auditMsg = auditTransformer.transformRequestToAuditMsg(message, assertion, null, direction,
                 NhincConstants.AUDIT_LOG_ADAPTER_INTERFACE);
@@ -808,7 +717,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * Create an audit log for an XDR Response at the NHIN interface.
-     * 
+     *
      * @param message The generic XDR Response message
      * @param assertion The assertion to be audited
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -827,7 +736,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an entity unsubscribe request.
-     * 
+     *
      * @param message The Entity Unsubscribe Request message to be audit logged.
      * @param direction The direction this message is going (Inbound or Outbound)
      * @param _interface The interface this message is being received/sent on (Entity, Adapter, or Nhin)
@@ -875,7 +784,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
      */
     public LogEventRequestType logAdapterAcknowledgement(XDRAcknowledgementType acknowledgement, AssertionType assertion,
             String direction, String action) {
-        LOG.debug("Entering AuditRepositoryLogger.logAdapterAcknowledgement(...)");        
+        LOG.debug("Entering AuditRepositoryLogger.logAdapterAcknowledgement(...)");
         LogEventRequestType auditMsg = xdrAuditTransformer.transformAcknowledgementToAuditMsg(acknowledgement,
                 assertion, null, direction, NhincConstants.AUDIT_LOG_ADAPTER_INTERFACE, action);
         LOG.debug("Exiting AuditRepositoryLogger.logAdapterAcknowledgement(...)");
@@ -901,7 +810,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
 
     /**
      * This method will create the generic Audit Log Message from an Entity Patient Discovery Response.
-     * 
+     *
      * @param message The Patient Discovery Response message to be audit logged.
      * @param assertion The Assertion Class containing SAML information
      * @param direction The direction this message is going (Inbound or Outbound)
@@ -911,8 +820,8 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
             gov.hhs.fha.nhinc.common.nhinccommonentity.RespondingGatewaySendAlertMessageType message,
             AssertionType assertion, String direction) {
     	LOG.trace("Entering AuditRepositoryLogger.logEntityPatientDiscResp(...)");
-        
-    	LogEventRequestType auditMsg = null;       
+
+    	LogEventRequestType auditMsg = null;
         try{
         	EDXLDistribution body = message.getEDXLDistribution();
         	auditMsg = adAuditTransformer.transformEDXLDistributionRequestToAuditMsg(body, assertion, direction,
@@ -920,7 +829,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
         }catch (NullPointerException ex){
         	LOG.error("The Incoming Send Alert message was Null", ex);
         }
-        
+
         LOG.trace("Exiting AuditRepositoryLogger.logEntityPatientDiscResp(...)");
         return auditMsg;
     }
@@ -950,7 +859,7 @@ public class AuditRepositoryLogger implements AuditRepositoryDocumentRetrieveLog
      */
     public LogEventRequestType logNhincAdminDist(EDXLDistribution message, AssertionType assertion, String direction,
             String _interface) {
-        
+
     	return adAuditTransformer.transformEDXLDistributionRequestToAuditMsg(message, assertion, direction, _interface);
     }
 

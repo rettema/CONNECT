@@ -48,6 +48,7 @@ import gov.hhs.fha.nhinc.properties.PropertyAccessor;
  * used in the application code. See the getNhinAuditQueryProxy() method in this class.
  *
  * @author Jon Hoppesch
+ * @author richard.ettema
  */
 public class NhinHiemNotifyProxyObjectFactory {
 
@@ -57,21 +58,23 @@ public class NhinHiemNotifyProxyObjectFactory {
     private static ApplicationContext context = null;
 
     static {
-        context = new FileSystemXmlApplicationContext(PropertyAccessor.getInstance().getPropertyFileURL()
-                + CONFIG_FILE_NAME);
+        context = new FileSystemXmlApplicationContext(PropertyAccessor.getInstance().getPropertyFileURL() + CONFIG_FILE_NAME);
     }
 
     /**
-     * Retrieve a nhin audit query implementation using the IOC framework. This method retrieves the object from the
-     * framework that has an identifier of "nhinhiemnotify."
+     * Retrieve a nhin audit query implementation using the IOC framework. This method retrieves the object from the framework
+     * that has an identifier of "nhinhiemnotify."
      *
      * @return NhinHiemNotifyProxy instance
      */
     public NhinHiemNotifyProxy getNhinHiemNotifyProxy() {
+
         NhinHiemNotifyProxy nhinHiemNotify = null;
+
         if (context != null) {
             nhinHiemNotify = (NhinHiemNotifyProxy) context.getBean(SPRING_BEAN_NAME);
         }
+
         return nhinHiemNotify;
     }
 

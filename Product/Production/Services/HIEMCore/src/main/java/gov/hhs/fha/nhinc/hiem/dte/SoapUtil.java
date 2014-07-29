@@ -42,8 +42,8 @@ import org.apache.log4j.Logger;
 
 /**
  *
- *
  * @author Neil Webb
+ * @author richard.ettema
  */
 public class SoapUtil {
 
@@ -54,11 +54,16 @@ public class SoapUtil {
      * @param attributeName
      */
     public void saveSoapMessageToContext(SOAPMessageContext context, String attributeName) {
-        LOG.debug("******** In handleMessage() *************");
+
+        LOG.debug("******** In saveSoapMessageToContext() *************");
+
         SOAPMessage soapMessage = null;
         String soapMessageText = null;
+
         try {
+
             if (context != null) {
+
                 LOG.debug("******** Context was not null *************");
                 soapMessage = context.getMessage();
                 LOG.debug("******** After getMessage *************");
@@ -92,22 +97,35 @@ public class SoapUtil {
     }
 
     private SOAPMessage extractSoapMessageObject(WebServiceContext context, String attributeName) {
+
+        LOG.debug("******** In extractSoapMessageObject() *************");
+
         SOAPMessage soapMessage = null;
+
         if (context != null) {
             MessageContext msgContext = context.getMessageContext();
             if (msgContext != null) {
                 javax.servlet.http.HttpServletRequest servletRequest = (javax.servlet.http.HttpServletRequest) msgContext
                         .get(MessageContext.SERVLET_REQUEST);
                 soapMessage = (SOAPMessage) servletRequest.getAttribute(attributeName);
+            } else {
+                LOG.debug("MessageContext was null");
             }
+        } else {
+            LOG.debug("WebServiceContext was null");
         }
+
         return soapMessage;
     }
 
     public String extractSoapMessage(WebServiceContext context, String attributeName) {
+
+        LOG.debug("******** In extractSoapMessage() *************");
+
         String extractedMessage = null;
 
         SOAPMessage soapMessage = extractSoapMessageObject(context, attributeName);
+
         if (soapMessage != null) {
             LOG.debug("******** Attempting to write out SOAP message *************");
             try {
@@ -147,5 +165,6 @@ public class SoapUtil {
             header = message.getSOAPHeader();
         }
         return header;
-    }    
+    }
+
 }

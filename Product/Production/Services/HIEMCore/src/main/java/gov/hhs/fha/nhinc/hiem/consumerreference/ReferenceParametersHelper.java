@@ -1,28 +1,28 @@
 /*
- * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services. 
- * All rights reserved. 
+ * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services.
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
- *     * Redistributions of source code must retain the above 
- *       copyright notice, this list of conditions and the following disclaimer. 
- *     * Redistributions in binary form must reproduce the above copyright 
- *       notice, this list of conditions and the following disclaimer in the documentation 
- *       and/or other materials provided with the distribution. 
- *     * Neither the name of the United States Government nor the 
- *       names of its contributors may be used to endorse or promote products 
- *       derived from this software without specific prior written permission. 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the documentation
+ *       and/or other materials provided with the distribution.
+ *     * Neither the name of the United States Government nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY 
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND 
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package gov.hhs.fha.nhinc.hiem.consumerreference;
 
@@ -35,8 +35,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * 
+ *
  * @author rayj
+ * @author richard.ettema
  */
 public class ReferenceParametersHelper {
 
@@ -44,71 +45,103 @@ public class ReferenceParametersHelper {
 
     public SoapMessageElements createReferenceParameterElementsFromSubscriptionReference(String subscriptionReferenceXml)
             throws XPathExpressionException {
-        LOG.debug("extracting reference parameters from subscription reference [" + subscriptionReferenceXml + "]");
+
+        LOG.debug("extracting reference parameters from subscribe subscription reference [" + subscriptionReferenceXml + "]");
+
         String xpathQuery = "//*[local-name()='ReferenceParameters']";
+
         return createReferenceParameterElementsFromEndpointReference(subscriptionReferenceXml, xpathQuery);
     }
 
     public SoapMessageElements createReferenceParameterElementsFromConsumerReference(String subscribeXml)
             throws XPathExpressionException {
-        LOG.debug("extracting reference parameters from subscribe [" + subscribeXml + "]");
+
+        LOG.debug("extracting reference parameters from subscribe consumer reference [" + subscribeXml + "]");
+
         String xpathQuery = "//*[local-name()='ReferenceParameters']";
+
         return createReferenceParameterElementsFromEndpointReference(subscribeXml, xpathQuery);
     }
-    
+
     public static String getWsAddressingTo(SoapMessageElements referenceParametersElements) {
-        
+
+        LOG.debug("extracting WS-Addressing To from SoapMessageElements");
+
         String wsAddressingTo = null;
-        for (Element referenceParametersElement : referenceParametersElements.getElements()) {
 
-            String nodeName = referenceParametersElement.getLocalName().toLowerCase();
-                   
-            if (nodeName.equals("to")) {
-                String nodeValue = referenceParametersElement.getNodeValue();
-                if (nodeValue == null && referenceParametersElement.getFirstChild() != null) {
-                    nodeValue = referenceParametersElement.getFirstChild().getNodeValue();
+        if (referenceParametersElements != null) {
+
+            for (Element referenceParametersElement : referenceParametersElements.getElements()) {
+
+                String nodeName = referenceParametersElement.getLocalName().toLowerCase();
+
+                if (nodeName.equals("to")) {
+                    String nodeValue = referenceParametersElement.getNodeValue();
+                    if (nodeValue == null && referenceParametersElement.getFirstChild() != null) {
+                        nodeValue = referenceParametersElement.getFirstChild().getNodeValue();
+                    }
+
+                    wsAddressingTo = nodeValue;
+                    break;
                 }
-                                
-                wsAddressingTo = nodeValue;
-                break;
             }
-        }
-        
-        return wsAddressingTo;
-        
-    }
-    
-    public static String getSubscriptionId(SoapMessageElements referenceParametersElements) {
-        String SubscriptionId = null;
-        for (Element referenceParametersElement : referenceParametersElements.getElements()) {
 
-            String nodeName = referenceParametersElement.getLocalName().toLowerCase();
-                   
-            if (nodeName.equals("subscriptionid")) {
-                String nodeValue = referenceParametersElement.getNodeValue();
-                LOG.debug("nodeValue SubscriptionId :"+nodeValue);
-                if (nodeValue == null && referenceParametersElement.getFirstChild() != null) {
-                    nodeValue = referenceParametersElement.getFirstChild().getNodeValue(); 
-                }
-           SubscriptionId = nodeValue;
-           LOG.debug("SubscriptionId: "+SubscriptionId);
-           break;
+        } else {
+            LOG.debug("SoapMessageElements is NULL");
         }
+
+        return wsAddressingTo;
     }
-    return SubscriptionId;
+
+    public static String getSubscriptionId(SoapMessageElements referenceParametersElements) {
+
+        LOG.debug("extracting SubscriptionId from SoapMessageElements");
+
+        String SubscriptionId = null;
+
+        if (referenceParametersElements != null) {
+
+            for (Element referenceParametersElement : referenceParametersElements.getElements()) {
+
+                String nodeName = referenceParametersElement.getLocalName().toLowerCase();
+
+                if (nodeName.equals("subscriptionid")) {
+                    String nodeValue = referenceParametersElement.getNodeValue();
+                    LOG.debug("nodeValue SubscriptionId :" + nodeValue);
+                    if (nodeValue == null && referenceParametersElement.getFirstChild() != null) {
+                        nodeValue = referenceParametersElement.getFirstChild().getNodeValue();
+                    }
+                    SubscriptionId = nodeValue;
+                    LOG.debug("SubscriptionId: " + SubscriptionId);
+                    break;
+                }
+            }
+
+        } else {
+            LOG.debug("SoapMessageElements is NULL");
+        }
+
+        return SubscriptionId;
     }
 
     private SoapMessageElements createReferenceParameterElementsFromEndpointReference(String xml, String xpathQuery)
             throws XPathExpressionException {
+
         LOG.debug("extracting reference parameters from xml [" + xml + "]");
         LOG.debug("get endpoint reference using xpath:" + xpathQuery);
+
         Element endpointReference = (Element) XpathHelper.performXpathQuery(xml, xpathQuery);
+
         return createReferenceParameterElementsFromEndpointReference(endpointReference);
     }
 
     private SoapMessageElements createReferenceParameterElementsFromEndpointReference(Element endpointReference)
             throws XPathExpressionException {
+
+        LOG.debug("extracting reference parameters from Endpoint Reference");
+
         SoapMessageElements referenceParametersElements = new SoapMessageElements();
+
         if (endpointReference != null) {
             for (int i = 0; i < endpointReference.getChildNodes().getLength(); i++) {
                 Node childNode = endpointReference.getChildNodes().item(i);
@@ -122,8 +155,10 @@ public class ReferenceParametersHelper {
                 }
             }
         }
-        LOG.debug("referenceParametersElements.getElements().size() = "
-                + referenceParametersElements.getElements().size());
+
+        LOG.debug("referenceParametersElements.getElements().size() = " + referenceParametersElements.getElements().size());
+
         return referenceParametersElements;
     }
+
 }

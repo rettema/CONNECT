@@ -26,33 +26,17 @@
  */
 package gov.hhs.fha.nhinc.hiem._20.subscribe.nhin;
 
-import gov.hhs.fha.nhinc.auditrepository.AuditRepositoryLogger;
-import gov.hhs.fha.nhinc.auditrepository.nhinc.proxy.AuditRepositoryProxy;
-import gov.hhs.fha.nhinc.auditrepository.nhinc.proxy.AuditRepositoryProxyObjectFactory;
-import gov.hhs.fha.nhinc.common.auditlog.LogEventRequestType;
-import gov.hhs.fha.nhinc.common.eventcommon.SubscribeEventType;
-import gov.hhs.fha.nhinc.common.eventcommon.SubscribeMessageType;
-import gov.hhs.fha.nhinc.common.hiemauditlog.SubscribeResponseMessageType;
 import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
-import gov.hhs.fha.nhinc.common.nhinccommonadapter.CheckPolicyRequestType;
-import gov.hhs.fha.nhinc.common.nhinccommonadapter.CheckPolicyResponseType;
-import gov.hhs.fha.nhinc.common.nhinccommoninternalorch.SubscribeRequestType;
-import gov.hhs.fha.nhinc.cxf.extraction.SAML2AssertionExtractor;
 import gov.hhs.fha.nhinc.hiem.dte.SoapUtil;
+import gov.hhs.fha.nhinc.messaging.server.BaseService;
 import gov.hhs.fha.nhinc.nhinclib.NhincConstants;
-import gov.hhs.fha.nhinc.nhinclib.NullChecker;
-import gov.hhs.fha.nhinc.policyengine.PolicyEngineChecker;
-import gov.hhs.fha.nhinc.policyengine.adapter.proxy.PolicyEngineProxy;
-import gov.hhs.fha.nhinc.policyengine.adapter.proxy.PolicyEngineProxyObjectFactory;
-import gov.hhs.fha.nhinc.subscribe.nhin.NhinSubscribeProcessor;
+import gov.hhs.fha.nhinc.nhinclib.NhincConstants.UDDI_SPEC_VERSION;
+import gov.hhs.fha.nhinc.subscribe.inbound.InboundHiemSubscribe;
 
 import javax.xml.ws.WebServiceContext;
 
-import oasis.names.tc.xacml._2_0.context.schema.os.DecisionType;
-
 import org.apache.log4j.Logger;
 import org.oasis_open.docs.wsn.b_2.Subscribe;
-import org.oasis_open.docs.wsn.b_2.SubscribeCreationFailedFaultType;
 import org.oasis_open.docs.wsn.b_2.SubscribeResponse;
 import org.oasis_open.docs.wsn.bw_2.InvalidTopicExpressionFault;
 import org.oasis_open.docs.wsn.bw_2.NotifyMessageNotSupportedFault;
@@ -61,127 +45,53 @@ import org.oasis_open.docs.wsn.bw_2.TopicNotSupportedFault;
 import org.w3c.dom.Element;
 
 /**
- * 
+ * HIEM Nhin Subscribe Service Implementation
+ *
  * @author jhoppesc
+ * @author richard.ettema
  */
-public class HiemSubscribeImpl {
+public class HiemSubscribeImpl extends BaseService {
 
     private static final Logger LOG = Logger.getLogger(HiemSubscribeImpl.class);
 
+    private InboundHiemSubscribe inboundHiemSubscribe;
+
+    public HiemSubscribeImpl(InboundHiemSubscribe inboundHiemSubscribe) {
+        this.inboundHiemSubscribe = inboundHiemSubscribe;
+    }
+
+    /**
+     *
+     * @param subscribeRequest
+     * @param context
+     * @return
+     * @throws NotifyMessageNotSupportedFault
+     * @throws SubscribeCreationFailedFault
+     * @throws TopicNotSupportedFault
+     * @throws InvalidTopicExpressionFault
+     */
     public SubscribeResponse subscribe(Subscribe subscribeRequest, WebServiceContext context)
             throws NotifyMessageNotSupportedFault, SubscribeCreationFailedFault, TopicNotSupportedFault,
             InvalidTopicExpressionFault {
+
         LOG.debug("Entering HiemSubscriptionImpl.subscribe");
 
         Element soapMessage = extractSoapMessage(context);
 
-        NhinSubscribeProcessor subscribeProcessor = new NhinSubscribeProcessor();
-        AssertionType assertion = SAML2AssertionExtractor.getInstance().extractSamlAssertion(context);
-
-        // Audit the input message
-        auditInputMessage(subscribeRequest, assertion,
-                NhincConstants.AUDIT_LOG_INBOUND_DIRECTION, NhincConstants.AUDIT_LOG_NHIN_INTERFACE);
-
-        SubscribeResponse response = null;
-        if (checkPolicy(subscribeRequest, assertion)) {
-            // Audit the input message
-            auditInputMessage(subscribeRequest, assertion,
-                NhincConstants.AUDIT_LOG_OUTBOUND_DIRECTION, NhincConstants.AUDIT_LOG_ADAPTER_INTERFACE);
-
-            response = subscribeProcessor.processNhinSubscribe(soapMessage, assertion);
-
-            // Audit the response message
-            auditResponseMessage(response, assertion,
-                NhincConstants.AUDIT_LOG_INBOUND_DIRECTION, NhincConstants.AUDIT_LOG_ADAPTER_INTERFACE);
-        } else {
-            SubscribeCreationFailedFaultType faultInfo = null;
-            throw new SubscribeCreationFailedFault("Policy check failed", faultInfo);
+        AssertionType assertion = getAssertion(context, null);
+        if (assertion != null) {
+            assertion.setImplementsSpecVersion(UDDI_SPEC_VERSION.SPEC_2_0.toString());
         }
 
-        // Audit the response message
-        // Audit the response message
-        auditResponseMessage(response, assertion,
-                NhincConstants.AUDIT_LOG_OUTBOUND_DIRECTION, NhincConstants.AUDIT_LOG_NHIN_INTERFACE);
-
+        SubscribeResponse response = inboundHiemSubscribe.processNhinSubscribe(subscribeRequest, soapMessage, assertion);
 
         LOG.debug("Exiting HiemSubscriptionImpl.subscribe");
+
         return response;
-    }
-
-    private void auditInputMessage(Subscribe subscribe, AssertionType assertion,
-            String direction, String logInterface) {
-        LOG.debug("In HiemSubscriptionImpl.auditInputMessage");
-        try {
-            AuditRepositoryLogger auditLogger = new AuditRepositoryLogger();
-
-            SubscribeRequestType message = new SubscribeRequestType();
-            message.setAssertion(assertion);
-            message.setSubscribe(subscribe);
-
-            LogEventRequestType auditLogMsg = auditLogger.logNhinSubscribeRequest(message,
-                    direction, logInterface);
-
-            if (auditLogMsg != null) {
-                AuditRepositoryProxyObjectFactory auditRepoFactory = new AuditRepositoryProxyObjectFactory();
-                AuditRepositoryProxy proxy = auditRepoFactory.getAuditRepositoryProxy();
-                proxy.auditLog(auditLogMsg, assertion);
-            }
-        } catch (Throwable t) {
-            LOG.error("Error logging subscribe message: " + t.getMessage(), t);
-        }
-    }
-
-    private void auditResponseMessage(SubscribeResponse response, AssertionType assertion,
-            String direction, String logInterface) {
-        LOG.debug("In HiemSubscriptionImpl.auditResponseMessage");
-
-        try {
-            AuditRepositoryLogger auditLogger = new AuditRepositoryLogger();
-
-            SubscribeResponseMessageType message = new SubscribeResponseMessageType();
-            message.setAssertion(assertion);
-            message.setSubscribeResponse(response);
-
-            LogEventRequestType auditLogMsg = auditLogger.logSubscribeResponse(message,
-                    direction, logInterface);
-
-            if (auditLogMsg != null) {
-                AuditRepositoryProxyObjectFactory auditRepoFactory = new AuditRepositoryProxyObjectFactory();
-                AuditRepositoryProxy proxy = auditRepoFactory.getAuditRepositoryProxy();
-                proxy.auditLog(auditLogMsg, assertion);
-            }
-        } catch (Throwable t) {
-            LOG.error("Error loging subscription response: " + t.getMessage(), t);
-        }
-    }
-
-    private boolean checkPolicy(Subscribe subscribe, AssertionType assertion) {
-        LOG.debug("In HiemSubscriptionImpl.checkPolicy");
-        boolean policyIsValid = false;
-
-        SubscribeEventType policyCheckReq = new SubscribeEventType();
-        policyCheckReq.setDirection(NhincConstants.POLICYENGINE_INBOUND_DIRECTION);
-        SubscribeMessageType request = new SubscribeMessageType();
-        request.setAssertion(assertion);
-        request.setSubscribe(subscribe);
-        policyCheckReq.setMessage(request);
-
-        PolicyEngineChecker policyChecker = new PolicyEngineChecker();
-        CheckPolicyRequestType policyReq = policyChecker.checkPolicySubscribe(policyCheckReq);
-        PolicyEngineProxyObjectFactory policyEngFactory = new PolicyEngineProxyObjectFactory();
-        PolicyEngineProxy policyProxy = policyEngFactory.getPolicyEngineProxy();
-        CheckPolicyResponseType policyResp = policyProxy.checkPolicy(policyReq, assertion);
-
-        if (policyResp.getResponse() != null && NullChecker.isNotNullish(policyResp.getResponse().getResult())
-                && policyResp.getResponse().getResult().get(0).getDecision() == DecisionType.PERMIT) {
-            policyIsValid = true;
-        }
-
-        LOG.debug("Finished HiemSubscriptionImpl.checkPolicy - valid: " + policyIsValid);
-        return policyIsValid;
     }
 
     private Element extractSoapMessage(WebServiceContext context) {
         return new SoapUtil().extractSoapMessageElement(context, NhincConstants.HTTP_REQUEST_ATTRIBUTE_SOAPMESSAGE);
     }
+
 }

@@ -26,33 +26,54 @@
  */
 package gov.hhs.fha.nhinc.hiem._20.notify.nhin;
 
+import gov.hhs.fha.nhinc.aspect.InboundMessageEvent;
+import gov.hhs.fha.nhinc.notify.aspect.NotifyRequestTransformingBuilder;
+import gov.hhs.fha.nhinc.notify.aspect.NotifyResponseDescriptionBuilder;
+import gov.hhs.fha.nhinc.notify.inbound.InboundHiemNotify;
+
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.soap.Addressing;
 
+import org.oasis_open.docs.wsn.b_2.Notify;
+
 /**
+ * HIEM Nhin Notify Secured Interface
  *
  * @author Neil Webb
+ * @author richard.ettema
  */
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.NotificationConsumer")
 @BindingType(value = javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 @Addressing(enabled = true)
 public class HiemNotify {
-    @Resource
-    private WebServiceContext context;
-    private HiemNotifyImpl notifyImpl;
 
-    public void notify(org.oasis_open.docs.wsn.b_2.Notify notify) {
+    private InboundHiemNotify inboundHiemNotify;
+
+    private WebServiceContext context;
+
+    /**
+     *
+     * @param notify
+     */
+    @InboundMessageEvent(beforeBuilder = NotifyRequestTransformingBuilder.class,
+            afterReturningBuilder = NotifyResponseDescriptionBuilder.class, serviceType = "HIEM Notify",
+            version = "2.0")
+    public void notify(Notify notify) {
+        HiemNotifyImpl notifyImpl = new HiemNotifyImpl(inboundHiemNotify);
+
         notifyImpl.notify(notify, context);
     }
 
-    /**
-     * @param notifyImpl the notifyImpl to set
-     */
-    public void setNotifyImpl(HiemNotifyImpl notifyImpl) {
-        this.notifyImpl = notifyImpl;
+    public void setInboundHiemNotify(InboundHiemNotify inboundHiemNotify) {
+        this.inboundHiemNotify = inboundHiemNotify;
+    }
+
+    @Resource
+    public void setContext(WebServiceContext context) {
+        this.context = context;
     }
 
 }

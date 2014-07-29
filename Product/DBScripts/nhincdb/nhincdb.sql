@@ -139,20 +139,40 @@ GRANT SELECT,INSERT,UPDATE,DELETE ON patientcorrelationdb.* to nhincuser;
 CREATE DATABASE subscriptionrepository;
 
 CREATE TABLE subscriptionrepository.subscription (
-    id VARCHAR(128) NOT NULL COMMENT 'Database generated UUID',
-    Subscriptionid VARCHAR(128) COMMENT 'Unique identifier for a CONNECT generated subscription',
-    SubscribeXML LONGTEXT COMMENT 'Full subscribe message as an XML string',
-    SubscriptionReferenceXML LONGTEXT COMMENT 'Full subscription reference as an XML string',
-    RootTopic LONGTEXT COMMENT 'Root topic of the subscription record',
-    ParentSubscriptionId VARCHAR(128) COMMENT 'Subscription id for a parent record provided for fast searching',
-    ParentSubscriptionReferenceXML LONGTEXT COMMENT 'Full subscription reference for a parent record as an XML string',
-    Consumer VARCHAR(128) COMMENT 'Notification consumer system',
-    Producer VARCHAR(128) COMMENT 'Notification producer system',
-    PatientId VARCHAR(128) COMMENT 'Local system patient identifier',
-    PatientAssigningAuthority VARCHAR(128) COMMENT 'Assigning authority for the local patient identifier',
-    Targets LONGTEXT COMMENT 'Full target system as an XML string',
-    CreationDate DATETIME COMMENT 'Format of YYYYMMDDHHMMSS',
-  PRIMARY KEY(id)
+  id BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Database generated identifier',
+  subscriptionId VARCHAR(128) NOT NULL COMMENT 'Unique identifier UUID for a CONNECT generated subscription',
+  subscriptionStatus VARCHAR(45) NULL DEFAULT NULL COMMENT 'Subcription status \'SUBSCRIBED\', \'UNSUBSCRIBED\'',
+  subscriptionRole VARCHAR(45) NULL DEFAULT NULL COMMENT 'Subcription role \'CONSUMER\', \'PRODUCER\'',
+  topic VARCHAR(255) NULL DEFAULT NULL COMMENT 'Topic of the subscription record',
+  dialect VARCHAR(255) NULL DEFAULT NULL,
+  consumer VARCHAR(128) NULL DEFAULT NULL COMMENT 'Notification consumer home community id',
+  producer VARCHAR(128) NULL DEFAULT NULL COMMENT 'Notification producer home community id',
+  patientId VARCHAR(128) NULL DEFAULT NULL COMMENT 'Local system patient identifier',
+  patientAssigningAuthority VARCHAR(128) NULL DEFAULT NULL COMMENT 'Assigning authority for the local patient identifier',
+  creationTime DATETIME NULL DEFAULT NULL COMMENT 'Format of YYYYMMDDHHMMSS',
+  subscribeXML LONGTEXT NULL DEFAULT NULL COMMENT 'Full subscribe message as an XML string',
+  subscriptionReferenceXML LONGTEXT NULL DEFAULT NULL COMMENT 'Full subscription reference as an XML string',
+  targets LONGTEXT NULL DEFAULT NULL COMMENT 'Full target system as an XML string',
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE subscriptionrepository.notification (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  subscriptionId BIGINT NOT NULL COMMENT 'Foriegn key to subscription table',
+  notificationStatus VARCHAR(45) NULL COMMENT 'Notification status \'ERROR\', \'FAILED\', \'RECEIVED\', \'SENT\'',
+  topic VARCHAR(255) NULL DEFAULT NULL COMMENT 'Topic name',
+  dialect VARCHAR(255) NULL DEFAULT NULL COMMENT 'Topic dialect format',
+  fileName VARCHAR(255) NULL DEFAULT NULL COMMENT 'Fully qualified path and file name of notification message location',
+  notificationTime DATETIME NULL DEFAULT NULL COMMENT 'Format of YYYYMMDDHHMMSS',
+  notificationMessage LONGTEXT NULL DEFAULT NULL COMMENT 'Inbound notification message as an XML string',
+  acknowledgementMessage LONGTEXT NULL DEFAULT NULL COMMENT 'Response acknowledgement message as an XML string',
+  PRIMARY KEY (id),
+  INDEX fk_notification_subscription (subscriptionId ASC),
+  CONSTRAINT fk_notification_subscription
+    FOREIGN KEY (subscriptionId )
+    REFERENCES subscriptionrepository.subscription (id )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
 
 GRANT SELECT,INSERT,UPDATE,DELETE ON subscriptionrepository.* to nhincuser;

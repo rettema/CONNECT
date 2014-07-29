@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : ManageEventMessaging
+    Description: HIEM Re-implementation - 2014-06-19
+    Created on : May 15, 2014, 08:28:41 PM
+    Author     : richard.ettema
+-->
+
+<jsp:root version="2.1" xmlns:jsp="http://java.sun.com/JSP/Page"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:webuijsf="http://www.sun.com/webui/webuijsf">
+    <jsp:directive.page contentType="text/html; charset=UTF-8"
+        pageEncoding="UTF-8" />
+    <f:view>
+        <webuijsf:page id="ManageEventMessaging">
+            <webuijsf:html id="html1">
+            <webuijsf:head id="head1" title="Event Messaging">
+                <webuijsf:link id="link1"
+                    url="/CONNECTEventMessagingGUI/resources/stylesheet.css" />
+            </webuijsf:head>
+            <webuijsf:body id="body1" style="-rave-layout: grid">
+                <webuijsf:form id="eventMessagingForm">
+                    <webuijsf:image height="100" id="connectImage"
+                        style="left: 4px; top: 4px; position: absolute"
+                        url="/CONNECTEventMessagingGUI/resources/connect.GIF" width="312" />
+                    <webuijsf:tabSet binding="#{ManageEventMessaging.processTabSet}"
+                        id="processTabSet" selected="processSubscriptionsTab"
+                        style="height: 526px; left: 36px; top: 120px; position: absolute; width: 800px">
+
+                        <webuijsf:tab
+                            actionExpression="#{ManageEventMessaging.processSubscriptionsTab_action}"
+                            binding="#{ManageEventMessaging.processSubscriptionsTab}"
+                            id="processSubscriptionsTab"
+                            style="font-family: 'Arial','Helvetica',sans-serif; font-size: 12px"
+                            text="Subscriptions">
+
+                            <webuijsf:panelLayout id="processSubscriptionsLayoutPanel"
+                                style="height: 537px; position: relative; width: 800px; -rave-layout: grid">
+
+                                <webuijsf:panelLayout id="searchSubscriptionsTabSubLayoutPanel"
+                                    style="height: 40px; position: relative; width: 600px; -rave-layout: grid">
+                                    <webuijsf:staticText id="subscriptionStartDateTextLabelId"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 1px; top: 24px; position: relative"
+                                        text="Start Creation Time:" />
+                                    <webuijsf:textField id="subscriptionStartDateTextFieldId"
+                                        toolTip="MMDDYYYY HH:MM:SS"
+                                        binding="#{ManageEventMessaging.subscriptionStartDate}"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 24px; position: relative" />
+                                    <webuijsf:staticText style="width: 10px" text="" />
+                                    <webuijsf:staticText id="subscriptionStopDateTextLabelId"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 24px; position: relative"
+                                        text="Stop Creation Time:" />
+                                    <webuijsf:textField id="subscriptionStopDateTextFieldId"
+                                        toolTip="MMDDYYYY HH:MM:SS"
+                                        binding="#{ManageEventMessaging.subscriptionStopDate}"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 24px; position: relative" />
+                                    <br/>
+                                    <webuijsf:staticText id="subscriptionRoleLabelId"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 30px; position: relative"
+                                        text="Role:" />
+                                    <webuijsf:dropDown id="subscriptionRoleDropDownId"
+                                        binding="#{ManageEventMessaging.subscriptionRoleDD}"
+                                        items="#{UserSession.subscriptionRoleItems}"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 30px; position: relative" />
+                                    <webuijsf:staticText style="width: 10px" text="" />
+                                    <webuijsf:staticText id="subscriptionStatusLabelId"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 30px; position: relative"
+                                        text="Status:" />
+                                    <webuijsf:dropDown id="subscriptionStatusDropDownId"
+                                        binding="#{ManageEventMessaging.subscriptionStatusDD}"
+                                        items="#{UserSession.subscriptionStatusItems}"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 30px; position: relative" />
+                                    <webuijsf:staticText style="width: 10px" text="" />
+                                    <webuijsf:button
+                                        actionExpression="#{ManageEventMessaging.retrieveSubscriptionsButton_action}"
+                                        id="searchButton"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 12px; left: 60px; top: 55px; position: relative; width: 72px"
+                                        text="Search" />
+                                </webuijsf:panelLayout>
+
+                                <webuijsf:table augmentTitle="false"
+                                    id="processSubscriptionsResults" paginateButton="true"
+                                    paginationControls="true"
+                                    style="left: 0px; top: 80px; position: absolute; width: 800px"
+                                    title="Subscriptions Records" width="800">
+                                    <webuijsf:tableRowGroup id="subscriptionsResults"
+                                        sourceData="#{UserSession.subscriptionResults}"
+                                        sourceVar="subscriptionItem">
+                                        <webuijsf:tableColumn headerText="Subscription Id"
+                                            id="SubscriptionId">
+                                            <webuijsf:staticText id="subscriptionIdText"
+                                                text="#{subscriptionItem.value['subscriptionId']}" />
+                                        </webuijsf:tableColumn>
+                                        <webuijsf:tableColumn headerText="Status" id="SubscriptionStatus">
+                                            <webuijsf:staticText id="subscriptionStatusText"
+                                                text="#{processSubscription.value['subscriptionStatus']}" />
+                                        </webuijsf:tableColumn>
+                                        <webuijsf:tableColumn headerText="Role" id="SubscriptionRole">
+                                            <webuijsf:staticText id="subscriptionRoleText"
+                                                text="#{processSubscription.value['subscriptionRole']}" />
+                                        </webuijsf:tableColumn>
+                                        <webuijsf:tableColumn headerText="Creation Time"
+                                            id="CreationTime">
+                                            <webuijsf:staticText id="creationTimeText"
+                                                text="#{processSubscription.value['creationTime']}" />
+                                        </webuijsf:tableColumn>
+                                        <webuijsf:tableColumn headerText="Topic" id="Topic">
+                                            <webuijsf:staticText id="topicText"
+                                                text="#{processSubscription.value['topic']}" />
+                                        </webuijsf:tableColumn>
+                                        <webuijsf:tableColumn headerText="Action" id="action">
+                                            <!--
+                                            <webuijsf:button
+                                                binding="#{ManageEventMessaging.processButton}"
+                                                actionListenerExpression="#{ManageEventMessaging.process_action}"
+                                                id="forceProcessButton" text="Process"
+                                                style="font-family: 'Arial','Helvetica',sans-serif;font-size: 12px; width: 64px" />
+                                            -->
+                                        </webuijsf:tableColumn>
+                                    </webuijsf:tableRowGroup>
+                                </webuijsf:table>
+                            </webuijsf:panelLayout>
+                        </webuijsf:tab>
+
+                        <webuijsf:tab
+                            actionExpression="#{ManageEventMessaging.processNotificationsTab_action}"
+                            binding="#{ManageEventMessaging.processNotificationsTab}"
+                            id="processNotificationsTab"
+                            style="font-family: 'Arial','Helvetica',sans-serif; font-size: 12px"
+                            text="Notifications">
+
+                            <webuijsf:panelLayout id="processNotificationsTabLayoutPanel"
+                                style="height: 537px; position: relative; width: 600px; -rave-layout: grid">
+
+                                <webuijsf:panelLayout id="processNotificationsTabSubLayoutPanel"
+                                    style="height: 40px; position: relative; width: 600px; -rave-layout: grid">
+                                    <webuijsf:staticText id="startNotificationTimeTextLabelId"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 1px; top: 24px; position: relative"
+                                        text="Start Notification Time:" />
+                                    <webuijsf:textField id="startNotificationTimeTextFieldId"
+                                        toolTip="MMDDYYYY HH:MM:SS"
+                                        binding="#{ManageEventMessaging.notificationStartDate}"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 24px; position: relative" />
+                                    <webuijsf:staticText style="width: 10px" text="" />
+                                    <webuijsf:staticText id="stopNotificationTimeTextLabelId"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 24px; position: relative"
+                                        text="Stop Notification Time:" />
+                                    <webuijsf:textField id="stopNotificationTimeTextFieldId"
+                                        toolTip="MMDDYYYY HH:MM:SS"
+                                        binding="#{ManageEventMessaging.notificationStopDate}"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 24px; position: relative" />
+                                    <br/>
+                                    <webuijsf:staticText id="statusLabelId"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 30px; position: relative"
+                                        text="Status:" />
+                                    <webuijsf:dropDown id="notificationStatusDropDownId"
+                                        binding="#{ManageEventMessaging.notificationStatusDD}"
+                                        items="#{UserSession.notificationStatusItems}"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 14px; font-weight: bolder; left: 2px; top: 30px; position: relative" />
+                                    <webuijsf:staticText style="width: 10px" text="" />
+                                    <webuijsf:button
+                                        actionExpression="#{ManageEventMessaging.retrieveNotificationsButton_action}"
+                                        id="searchButton"
+                                        style="font-family: 'Arial','Helvetica',sans-serif; font-size: 12px; left: 60px; top: 55px; position: relative; width: 72px"
+                                        text="Search" />
+                                </webuijsf:panelLayout>
+
+                                <webuijsf:table augmentTitle="false"
+                                    id="processNotificationsResults"
+                                    style="left: 0px; top: 130px; position: absolute; width: 800px"
+                                    title="Notification Records" width="800">
+
+                                    <webuijsf:tableRowGroup id="processNotificationsResults"
+                                        sourceData="#{UserSession.notificationResults}"
+                                        sourceVar="processNotification">
+                                        <webuijsf:tableColumn headerText="Notification Id"
+                                            id="NotificationId">
+                                            <webuijsf:staticText id="notificationIdText"
+                                                text="#{processNotification.value['id']}" />
+                                        </webuijsf:tableColumn>
+                                        <webuijsf:tableColumn headerText="Notification Time"
+                                            id="NotificationTime">
+                                            <webuijsf:staticText id="notificationTimeText"
+                                                text="#{processNotification.value['notificationTime']}" />
+                                        </webuijsf:tableColumn>
+                                        <webuijsf:tableColumn headerText="Status" id="Status">
+                                            <webuijsf:staticText id="notificationStatusText"
+                                                text="#{processNotification.value['notificationStatus']}" />
+                                        </webuijsf:tableColumn>
+                                        <webuijsf:tableColumn headerText="File Name"
+                                            id="FileName">
+                                            <webuijsf:staticText id="fileNameText"
+                                                text="#{processNotification.value['fileName']}" />
+                                        </webuijsf:tableColumn>
+                                    </webuijsf:tableRowGroup>
+                                </webuijsf:table>
+                            </webuijsf:panelLayout>
+                        </webuijsf:tab>
+                    </webuijsf:tabSet>
+
+                    <webuijsf:staticText
+                        binding="#{ManageEventMessaging.errorMessages}" id="errorMessages"
+                        style="color: red; font-family: 'Arial','Helvetica',sans-serif; font-size: 12px; left: 34px; top: 100px; position: absolute" />
+
+                    <webuijsf:label id="UCLabel1"
+                        style="color: gray; font-family: 'Arial','Helvetica',sans-serif; font-size: 32px; left: 360px; top: 36px; position: absolute"
+                        text="EVENT MESSAGING" />
+                </webuijsf:form>
+            </webuijsf:body>
+
+            </webuijsf:html>
+        </webuijsf:page>
+    </f:view>
+</jsp:root>
+
+

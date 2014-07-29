@@ -26,94 +26,88 @@
  */
 package gov.hhs.fha.nhinc.notify.adapter.proxy;
 
-import gov.hhs.fha.nhinc.adapternotificationconsumer.AdapterNotificationConsumerPortType;
+import gov.hhs.fha.nhinc.adaptersubscription.AdapterNotificationConsumerUnsecured;
+import gov.hhs.fha.nhinc.aspect.AdapterDelegationEvent;
 import gov.hhs.fha.nhinc.common.nhinccommon.AcknowledgementType;
 import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
-import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType;
 import gov.hhs.fha.nhinc.common.nhinccommonadapter.NotifyRequestType;
 import gov.hhs.fha.nhinc.hiem.consumerreference.SoapMessageElements;
-import gov.hhs.fha.nhinc.hiem.dte.marshallers.NhincCommonAcknowledgementMarshaller;
-import gov.hhs.fha.nhinc.hiem.dte.marshallers.WsntSubscribeMarshaller;
 import gov.hhs.fha.nhinc.messaging.client.CONNECTCXFClientFactory;
 import gov.hhs.fha.nhinc.messaging.client.CONNECTClient;
 import gov.hhs.fha.nhinc.messaging.service.port.ServicePortDescriptor;
 import gov.hhs.fha.nhinc.nhinclib.NhincConstants;
 import gov.hhs.fha.nhinc.nhinclib.NullChecker;
 import gov.hhs.fha.nhinc.notify.adapter.proxy.service.HiemNotifyAdapterServicePortDescriptor;
+import gov.hhs.fha.nhinc.notify.aspect.NotifyRequestTransformingBuilder;
+import gov.hhs.fha.nhinc.notify.aspect.NotifyResponseDescriptionBuilder;
 import gov.hhs.fha.nhinc.webserviceproxy.WebServiceProxyHelper;
 
 import org.apache.log4j.Logger;
 import org.oasis_open.docs.wsn.b_2.Notify;
-import org.w3c.dom.Element;
 
 /**
- * 
+ *
  * @author Jon Hoppesch
+ * @author richard.ettema
  */
 public class HiemNotifyAdapterWebServiceProxy implements HiemNotifyAdapterProxy {
 
     private static final Logger LOG = Logger.getLogger(HiemNotifyAdapterWebServiceProxy.class);
 
-    private static WebServiceProxyHelper oProxyHelper = null;
+    /* (non-Javadoc)
+     * @see gov.hhs.fha.nhinc.notify.adapter.proxy.HiemNotifyAdapterProxy#notify(org.w3c.dom.Element, gov.hhs.fha.nhinc.hiem.consumerreference.SoapMessageElements, gov.hhs.fha.nhinc.common.nhinccommon.AssertionType)
+     */
+    @AdapterDelegationEvent(beforeBuilder = NotifyRequestTransformingBuilder.class,
+            afterReturningBuilder = NotifyResponseDescriptionBuilder.class, serviceType = "HIEM Notify",
+            version = "2.0")
+    public AcknowledgementType notify(Notify notify, SoapMessageElements referenceParametersElements, AssertionType assertion)
+            throws Exception {
 
-    protected CONNECTClient<AdapterNotificationConsumerPortType> getCONNECTClientUnsecured(
-            ServicePortDescriptor<AdapterNotificationConsumerPortType> portDescriptor, String url,
-            AssertionType assertion) {
+        LOG.debug("Begin HiemNotifyAdapterWebServiceProxy.notify");
 
-        return CONNECTCXFClientFactory.getInstance().getCONNECTClientUnsecured(portDescriptor, url, assertion);
-    }
+        AcknowledgementType response = null;
 
-    public Element notify(Element notifyElement, SoapMessageElements referenceParametersElements,
-            AssertionType assertion, NhinTargetSystemType target) throws Exception {
-        Element responseElement = null;
-
-        String url = getWebServiceProxyHelper().getAdapterEndPointFromConnectionManager(
-                NhincConstants.HIEM_NOTIFY_ADAPTER_SERVICE_NAME);
+        WebServiceProxyHelper oProxyHelper = new WebServiceProxyHelper();
+        String url = oProxyHelper.getAdapterEndPointFromConnectionManager(NhincConstants.HIEM_NOTIFY_ADAPTER_SERVICE_NAME);
 
         if (NullChecker.isNotNullish(url)) {
 
-            WsntSubscribeMarshaller subscribeMarshaller = new WsntSubscribeMarshaller();
-            Notify notify = subscribeMarshaller.unmarshalNotifyRequest(notifyElement);
-
+            // Populate Notify Request for web service call
             NotifyRequestType adapternotifyRequest = new NotifyRequestType();
             adapternotifyRequest.setNotify(notify);
             adapternotifyRequest.setAssertion(assertion);
 
-            // SoapUtil soapUtil = new SoapUtil();
-            // soapUtil.attachReferenceParameterElements((WSBindingProvider) port, referenceParametersElements);
+            ServicePortDescriptor<AdapterNotificationConsumerUnsecured> portDescriptor = new HiemNotifyAdapterServicePortDescriptor();
 
-            ServicePortDescriptor<AdapterNotificationConsumerPortType> portDescriptor = new HiemNotifyAdapterServicePortDescriptor();
-
-            CONNECTClient<AdapterNotificationConsumerPortType> client = getCONNECTClientUnsecured(portDescriptor, url,
+            // Instantiate unsecured web service client
+            CONNECTClient<AdapterNotificationConsumerUnsecured> client = getCONNECTClientUnsecured(portDescriptor, url,
                     assertion);
 
-            AcknowledgementType response = (AcknowledgementType) client.invokePort(
-                    AdapterNotificationConsumerPortType.class, "notify", adapternotifyRequest);
-
-            NhincCommonAcknowledgementMarshaller acknowledgementMarshaller = new NhincCommonAcknowledgementMarshaller();
-            responseElement = acknowledgementMarshaller.marshal(response);
+            // Invoke unsecured web service client to send Notify request to adapter layer
+            response = (AcknowledgementType) client.invokePort(AdapterNotificationConsumerUnsecured.class,
+                    "notify", adapternotifyRequest);
         } else {
             LOG.error("Failed to call the web service (" + NhincConstants.HIEM_NOTIFY_ADAPTER_SERVICE_NAME
                     + ").  The URL is null.");
         }
 
-        return responseElement;
+        LOG.debug("End HiemNotifyAdapterWebServiceProxy.notify");
+
+        return response;
     }
 
-    public Element notifySubscribersOfDocument(Element docNotify, AssertionType assertion, NhinTargetSystemType target)
-            throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+    /**
+     *
+     * @param portDescriptor
+     * @param url
+     * @param assertion
+     * @return
+     */
+    private CONNECTClient<AdapterNotificationConsumerUnsecured> getCONNECTClientUnsecured(
+            ServicePortDescriptor<AdapterNotificationConsumerUnsecured> portDescriptor, String url, AssertionType assertion) {
+
+        return CONNECTCXFClientFactory.getInstance().getCONNECTClientUnsecured(portDescriptor, url, assertion,
+                null);
     }
 
-    public Element notifySubscribersOfCdcBioPackage(Element cdcNotify, AssertionType assertion,
-            NhinTargetSystemType target) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    private WebServiceProxyHelper getWebServiceProxyHelper() {
-        if (oProxyHelper == null) {
-            oProxyHelper = new WebServiceProxyHelper();
-        }
-        return oProxyHelper;
-    }
 }

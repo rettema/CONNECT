@@ -16,6 +16,7 @@
         <property name="connection.datasource">java:comp/env/jdbc/subscriptionrepository_datasource</property>
 
         <mapping resource="SubscriptionStorageItem.hbm.xml"/>
+        <mapping resource="NotificationStorageItem.hbm.xml"/>
 
     </session-factory>
 

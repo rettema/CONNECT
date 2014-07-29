@@ -26,22 +26,32 @@
  */
 package gov.hhs.fha.nhinc.subscribe.nhin.proxy;
 
+import gov.hhs.fha.nhinc.aspect.NwhinInvocationEvent;
 import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
 import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType;
+import gov.hhs.fha.nhinc.subscribe.aspect.SubscribeRequestTransformingBuilder;
+import gov.hhs.fha.nhinc.subscribe.aspect.SubscribeResponseDescriptionBuilder;
 
 import org.oasis_open.docs.wsn.b_2.Subscribe;
 import org.oasis_open.docs.wsn.b_2.SubscribeResponse;
 
 /**
- * 
+ *
  * @author Jon Hoppesch
+ * @author richard.ettema
  */
 public class NhinHiemSubscribeNoOpImpl implements NhinHiemSubscribeProxy {
-    /**
-     * The NoOp Implementation for Subscribe.
+
+    /* (non-Javadoc)
+     * @see gov.hhs.fha.nhinc.subscribe.nhin.proxy.NhinHiemSubscribeProxy#subscribe(org.oasis_open.docs.wsn.b_2.Subscribe, gov.hhs.fha.nhinc.common.nhinccommon.AssertionType, gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType)
      */
-	public SubscribeResponse subscribe(Subscribe subscribe, AssertionType assertion, NhinTargetSystemType target) {
+    @Override
+    @NwhinInvocationEvent(beforeBuilder = SubscribeRequestTransformingBuilder.class,
+        afterReturningBuilder = SubscribeResponseDescriptionBuilder.class, serviceType = "HIEM Subscribe",
+        version = "2.0")
+    public SubscribeResponse subscribe(Subscribe subscribe, AssertionType assertion, NhinTargetSystemType target) {
         SubscribeResponse response = new SubscribeResponse();
-    	return response;
+        return response;
     }
+
 }

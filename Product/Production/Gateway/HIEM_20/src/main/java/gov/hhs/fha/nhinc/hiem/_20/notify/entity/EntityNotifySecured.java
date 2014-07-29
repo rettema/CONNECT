@@ -26,42 +26,56 @@
  */
 package gov.hhs.fha.nhinc.hiem._20.notify.entity;
 
+import gov.hhs.fha.nhinc.aspect.OutboundMessageEvent;
+import gov.hhs.fha.nhinc.common.nhinccommon.AcknowledgementType;
+import gov.hhs.fha.nhinc.common.nhinccommonentity.NotifyRequestType;
+import gov.hhs.fha.nhinc.notify.aspect.NotifyRequestTransformingBuilder;
+import gov.hhs.fha.nhinc.notify.aspect.NotifyResponseDescriptionBuilder;
+import gov.hhs.fha.nhinc.notify.outbound.OutboundHiemNotify;
+
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.WebServiceContext;
-
-import org.oasis_open.docs.wsn.b_2.Notify;
-
-import gov.hhs.fha.nhinc.common.nhinccommon.AcknowledgementType;
-import gov.hhs.fha.nhinc.common.nhinccommonentity.NotifySubscribersOfDocumentRequestSecuredType;
-import gov.hhs.fha.nhinc.notify.entity.EntityNotifyOrchImpl;
+import javax.xml.ws.soap.Addressing;
 
 /**
+ * HIEM Entity Notify Secured Interface
  *
  * @author Sai Valluripalli
+ * @author richard.ettema
  */
-@WebService(
-        endpointInterface = "gov.hhs.fha.nhinc.entitynotificationconsumersecured.EntityNotificationConsumerSecuredPortType")
+@WebService(endpointInterface = "gov.hhs.fha.nhinc.entitysubscription.EntityNotificationConsumerSecured")
+@Addressing(enabled = true)
 @BindingType(value = javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class EntityNotifySecured {
-    @Resource
+
+    private OutboundHiemNotify outboundHiemNotify;
+
     private WebServiceContext context;
-    private EntityNotifyOrchImpl orchImpl;
-
-    public AcknowledgementType notifySubscribersOfDocument(
-            NotifySubscribersOfDocumentRequestSecuredType notifySubscribersOfDocumentRequestSecured) {
-        throw new UnsupportedOperationException("Not implemented.");
-    }
-
-    public AcknowledgementType notify(Notify notifyRequestSecured) {
-        return new EntityNotifyServiceImpl(orchImpl).notify(notifyRequestSecured, context);
-    }
 
     /**
-     * @param orchImpl the orchImpl to set
+     *
+     * @param notifyRequestSecured
+     * @return
      */
-    public void setOrchImpl(EntityNotifyOrchImpl orchImpl) {
-        this.orchImpl = orchImpl;
+    @OutboundMessageEvent(beforeBuilder = NotifyRequestTransformingBuilder.class,
+            afterReturningBuilder = NotifyResponseDescriptionBuilder.class, serviceType = "HIEM Notify",
+            version = "2.0")
+    public AcknowledgementType notify(NotifyRequestType notifyRequest) {
+
+        EntityNotifyServiceImpl serviceImpl = new EntityNotifyServiceImpl(outboundHiemNotify);
+
+        return serviceImpl.notify(notifyRequest, context);
     }
+
+    public void setOutboundHiemNotify(OutboundHiemNotify outboundHiemNotify) {
+        this.outboundHiemNotify = outboundHiemNotify;
+    }
+
+    @Resource
+    public void setContext(WebServiceContext context) {
+        this.context = context;
+    }
+
 }

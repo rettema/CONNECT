@@ -28,8 +28,15 @@ package gov.hhs.fha.nhinc.subscribe.nhin.proxy;
 
 import javax.xml.ws.BindingProvider;
 
+import gov.hhs.fha.nhinc.aspect.NwhinInvocationEvent;
+import gov.hhs.fha.nhinc.auditrepository.AuditRepositoryLogger;
+import gov.hhs.fha.nhinc.auditrepository.nhinc.proxy.AuditRepositoryProxy;
+import gov.hhs.fha.nhinc.auditrepository.nhinc.proxy.AuditRepositoryProxyObjectFactory;
+import gov.hhs.fha.nhinc.common.auditlog.LogEventRequestType;
+import gov.hhs.fha.nhinc.common.hiemauditlog.SubscribeResponseMessageType;
 import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
 import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType;
+import gov.hhs.fha.nhinc.common.nhinccommoninternalorch.SubscribeRequestType;
 import gov.hhs.fha.nhinc.connectmgr.ConnectionManagerCache;
 import gov.hhs.fha.nhinc.messaging.client.CONNECTCXFClientFactory;
 import gov.hhs.fha.nhinc.messaging.client.CONNECTClient;
@@ -37,6 +44,8 @@ import gov.hhs.fha.nhinc.messaging.service.port.ServicePortDescriptor;
 import gov.hhs.fha.nhinc.nhinclib.NhincConstants;
 import gov.hhs.fha.nhinc.nhinclib.NullChecker;
 import gov.hhs.fha.nhinc.nhinclib.NhincConstants.GATEWAY_API_LEVEL;
+import gov.hhs.fha.nhinc.subscribe.aspect.SubscribeRequestTransformingBuilder;
+import gov.hhs.fha.nhinc.subscribe.aspect.SubscribeResponseDescriptionBuilder;
 import gov.hhs.fha.nhinc.subscribe.nhin.proxy.service.NhinHiemSubscribeServicePortDescriptor;
 import gov.hhs.fha.nhinc.webserviceproxy.WebServiceProxyHelper;
 
@@ -46,8 +55,9 @@ import org.oasis_open.docs.wsn.b_2.SubscribeResponse;
 import org.oasis_open.docs.wsn.bw_2.NotificationProducer;
 
 /**
- * 
+ *
  * @author Jon Hoppesch
+ * @author richard.ettema
  */
 public class NhinHiemSubscribeWebServiceProxy implements NhinHiemSubscribeProxy {
 
@@ -59,12 +69,23 @@ public class NhinHiemSubscribeWebServiceProxy implements NhinHiemSubscribeProxy 
         return CONNECTCXFClientFactory.getInstance().getCONNECTClientSecured(portDescriptor, url, assertion);
     }
 
+    /* (non-Javadoc)
+     * @see gov.hhs.fha.nhinc.subscribe.nhin.proxy.NhinHiemSubscribeProxy#subscribe(org.oasis_open.docs.wsn.b_2.Subscribe, gov.hhs.fha.nhinc.common.nhinccommon.AssertionType, gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType)
+     */
     @Override
+    @NwhinInvocationEvent(beforeBuilder = SubscribeRequestTransformingBuilder.class,
+        afterReturningBuilder = SubscribeResponseDescriptionBuilder.class, serviceType = "HIEM Subscribe",
+        version = "2.0")
     public SubscribeResponse subscribe(Subscribe subscribe, AssertionType assertion, NhinTargetSystemType target)
             throws Exception {
+
         SubscribeResponse response = null;
 
         try {
+            // Audit the input message
+            auditInputMessage(subscribe, assertion, NhincConstants.AUDIT_LOG_OUTBOUND_DIRECTION,
+                    NhincConstants.AUDIT_LOG_NHIN_INTERFACE);
+
             String url = ConnectionManagerCache.getInstance().getEndpointURLFromNhinTarget(target,
                     NhincConstants.HIEM_SUBSCRIBE_SERVICE_NAME);
 
@@ -80,10 +101,13 @@ public class NhinHiemSubscribeWebServiceProxy implements NhinHiemSubscribeProxy 
                 WebServiceProxyHelper wsHelper = new WebServiceProxyHelper();
                 wsHelper.addTargetCommunity((BindingProvider) client.getPort(), target);
                 wsHelper.addTargetApiLevel((BindingProvider) client.getPort(), GATEWAY_API_LEVEL.LEVEL_g0);
-                wsHelper.addServiceName((BindingProvider) client.getPort(), 
-                        NhincConstants.HIEM_SUBSCRIBE_SERVICE_NAME);
-                
+                wsHelper.addServiceName((BindingProvider) client.getPort(), NhincConstants.HIEM_SUBSCRIBE_SERVICE_NAME);
+
                 response = (SubscribeResponse) client.invokePort(NotificationProducer.class, "subscribe", subscribe);
+
+                // Audit the response message
+                auditResponseMessage(response, assertion, NhincConstants.AUDIT_LOG_INBOUND_DIRECTION,
+                        NhincConstants.AUDIT_LOG_NHIN_INTERFACE);
             }
 
         } catch (Exception ex) {
@@ -91,6 +115,74 @@ public class NhinHiemSubscribeWebServiceProxy implements NhinHiemSubscribeProxy 
         }
 
         return response;
+    }
+
+    /**
+     * Audit the Subscribe (Nhin) request
+     *
+     * @param subscribe
+     * @param assertion
+     * @param direction
+     * @param logInterface
+     */
+    private void auditInputMessage(Subscribe subscribe, AssertionType assertion, String direction, String logInterface) {
+
+        LOG.debug("Begin NhinHiemSubscribeWebServiceProxy.auditInputMessage");
+
+        try {
+            AuditRepositoryLogger auditLogger = new AuditRepositoryLogger();
+
+            SubscribeRequestType message = new SubscribeRequestType();
+            message.setAssertion(assertion);
+            message.setSubscribe(subscribe);
+
+            LogEventRequestType auditLogMsg = auditLogger.logNhinSubscribeRequest(message, direction, logInterface);
+
+            if (auditLogMsg != null) {
+                AuditRepositoryProxyObjectFactory auditRepoFactory = new AuditRepositoryProxyObjectFactory();
+                AuditRepositoryProxy proxy = auditRepoFactory.getAuditRepositoryProxy();
+                proxy.auditLog(auditLogMsg, assertion);
+            }
+        } catch (Throwable t) {
+            LOG.error("Error logging subscribe message: " + t.getMessage(), t);
+        }
+
+        LOG.debug("End NhinHiemSubscribeWebServiceProxy.auditInputMessage");
+
+    }
+
+    /**
+     * Audit the Subscribe (Nhin) response.
+     *
+     * @param response
+     * @param assertion
+     * @param direction
+     * @param logInterface
+     */
+    private void auditResponseMessage(SubscribeResponse response, AssertionType assertion, String direction, String logInterface) {
+
+        LOG.debug("Begin NhinHiemSubscribeWebServiceProxy.auditResponseMessage");
+
+        try {
+            AuditRepositoryLogger auditLogger = new AuditRepositoryLogger();
+
+            SubscribeResponseMessageType message = new SubscribeResponseMessageType();
+            message.setAssertion(assertion);
+            message.setSubscribeResponse(response);
+
+            LogEventRequestType auditLogMsg = auditLogger.logSubscribeResponse(message, direction, logInterface);
+
+            if (auditLogMsg != null) {
+                AuditRepositoryProxyObjectFactory auditRepoFactory = new AuditRepositoryProxyObjectFactory();
+                AuditRepositoryProxy proxy = auditRepoFactory.getAuditRepositoryProxy();
+                proxy.auditLog(auditLogMsg, assertion);
+            }
+        } catch (Throwable t) {
+            LOG.error("Error loging subscription response: " + t.getMessage(), t);
+        }
+
+        LOG.debug("End NhinHiemSubscribeWebServiceProxy.auditResponseMessage");
+
     }
 
 }

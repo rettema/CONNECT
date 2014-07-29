@@ -26,66 +26,62 @@
  */
 package gov.hhs.fha.nhinc.hiem._20.notify.entity;
 
+import gov.hhs.fha.nhinc.common.nhinccommon.AcknowledgementType;
+import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
+import gov.hhs.fha.nhinc.common.nhinccommonentity.NotifyRequestType;
+import gov.hhs.fha.nhinc.hiem.dte.SoapUtil;
+import gov.hhs.fha.nhinc.messaging.server.BaseService;
+import gov.hhs.fha.nhinc.nhinclib.NhincConstants;
+import gov.hhs.fha.nhinc.notify.outbound.OutboundHiemNotify;
+
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.log4j.Logger;
-import org.oasis_open.docs.wsn.b_2.Notify;
-
-import gov.hhs.fha.nhinc.common.nhinccommon.AcknowledgementType;
-import gov.hhs.fha.nhinc.common.nhinccommonentity.NotifyRequestType;
-import gov.hhs.fha.nhinc.cxf.extraction.SAML2AssertionExtractor;
-import gov.hhs.fha.nhinc.hiem.dte.SoapUtil;
-import gov.hhs.fha.nhinc.nhinclib.NhincConstants;
-import gov.hhs.fha.nhinc.notify.entity.EntityNotifyOrchImpl;
 
 /**
- *
+ * HIEM Entity Notify Service Implementation
  *
  * @author Neil Webb
+ * @author richard.ettema
  */
-public class EntityNotifyServiceImpl {
+public class EntityNotifyServiceImpl extends BaseService {
 
     private static final Logger LOG = Logger.getLogger(EntityNotifyServiceImpl.class);
-    private EntityNotifyOrchImpl orchImpl;
 
-    EntityNotifyServiceImpl(EntityNotifyOrchImpl orchImpl) {
-        this.orchImpl = orchImpl;
-    }
+    private OutboundHiemNotify outboundHiemNotify;
 
-    public AcknowledgementType notify(NotifyRequestType notifyRequest, WebServiceContext context) {
-        LOG.debug("EntityNotifyServiceImpl.notify");
-        AcknowledgementType ack = new AcknowledgementType();
-
-        try {
-            String rawNotifyXml = new SoapUtil().extractSoapMessage(context, NhincConstants.HTTP_REQUEST_ATTRIBUTE_SOAPMESSAGE);
-
-            orchImpl.processNotify(notifyRequest.getNotify(), notifyRequest.getAssertion(), rawNotifyXml);
-        } catch (Throwable t) {
-            LOG.error("Exception encountered processing notify message: " + t.getMessage(), t);
-        }
-
-        return ack;
-    }
-
-    public AcknowledgementType notify(Notify notifyRequest, WebServiceContext context) {
-        LOG.debug("EntityNotifyServiceImpl.notify");
-        AcknowledgementType ack = new AcknowledgementType();
-
-        try {
-            String rawNotifyXml = new SoapUtil().extractSoapMessage(context, NhincConstants.HTTP_REQUEST_ATTRIBUTE_SOAPMESSAGE);
-            orchImpl.processNotify(notifyRequest, SAML2AssertionExtractor.getInstance().extractSamlAssertion(context), rawNotifyXml);
-        } catch (Throwable t) {
-            LOG.error("Exception encountered processing notify message: " + t.getMessage(), t);
-        }
-
-        return ack;
+    public EntityNotifyServiceImpl(OutboundHiemNotify outboundHiemNotify) {
+        this.outboundHiemNotify = outboundHiemNotify;
     }
 
     /**
-     * @param orchImpl the orchImpl to set
+     *
+     * @param notifyRequest
+     * @param context
+     * @return
      */
-    public void setOrchImpl(EntityNotifyOrchImpl orchImpl) {
-        this.orchImpl = orchImpl;
+    public AcknowledgementType notify(NotifyRequestType notifyRequest, WebServiceContext context) {
+
+        LOG.debug("Begin EntityNotifyServiceImpl.notify");
+
+        AcknowledgementType ack = new AcknowledgementType();
+
+        try {
+            String rawNotifyXml = new SoapUtil().extractSoapMessage(context, NhincConstants.HTTP_REQUEST_ATTRIBUTE_SOAPMESSAGE);
+
+            AssertionType assertion = notifyRequest.getAssertion();
+
+            outboundHiemNotify.processNotify(notifyRequest.getNotify(), assertion, rawNotifyXml);
+
+            ack.setMessage("Notify sent");
+
+        } catch (Throwable t) {
+            String messageText = "Exception encountered processing notify message: " + t.getMessage();
+            LOG.error(messageText, t);
+            ack.setMessage(messageText);
+        }
+
+        return ack;
     }
 
 }

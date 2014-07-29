@@ -1,72 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       default-lazy-init="true"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+">
 
 <!-- 
-	The beans available in this file must be identified in the "description" element for the Spring configuration application. Beans are listed between braces 
-	in the description separated with a comma like the following sample: {somebean,anotherbean}
+    The beans available in this file must be identified in the "description" element for the Spring configuration application. Beans are listed between braces 
+    in the description separated with a comma like the following sample: {somebean,anotherbean}
 -->
-	<description>Beans included in this file: {hiemsubscribeadapter,hiemnotifyadapter,hiemunsubscribeadapter}</description>
-	
-	<alias alias="hiemsubscribeadapter" name="hiemsubscribeadapterwsunsecured" />
+    <description>Beans included in this file: {hiemsubscribeadapter,hiemnotifyadapter,hiemunsubscribeadapter}</description>
 
-	<!-- No-op Implementation -->
-	<bean class="gov.hhs.fha.nhinc.subscribe.adapter.proxy.HiemSubscribeAdapterNoOpImpl" id="hiemsubscribeadapternoop" name="hiemsubscribeadapternoop"> 
-		<meta key="impltype" value="noop"/>
-	</bean> 
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+    <context:annotation-config />
 
-	<!-- Secured web service Implementation -->
-    <bean class="gov.hhs.fha.nhinc.subscribe.adapter.proxy.HiemSubscribeAdapterWebServiceProxySecured" id="hiemsubscribeadapterwssecured" name="hiemsubscribeadapterwssecured"> 
-		<meta key="impltype" value="wssecured"/>
-	</bean> 
+    <import resource="classpath:CONNECT-context.xml"/>
+    <import resource="classpath:eventlogging.xml"/>
 
-	<!-- Unsecured web service Implementation -->
-	<bean class="gov.hhs.fha.nhinc.subscribe.adapter.proxy.HiemSubscribeAdapterWebServiceProxy" id="hiemsubscribeadapterwsunsecured" name="hiemsubscribeadapterwsunsecured"> 
-		<meta key="impltype" value="wsunsecured"/>
-		<meta key="default" value="true"/>
-	</bean> 
+    <!-- ******************************************************************** -->
 
-  	<!-- ******************************************************************** -->
-  	
-  	<alias alias="hiemnotifyadapter" name="hiemnotifyadapternoop" />
+    <alias alias="hiemsubscribeadapter" name="hiemsubscribeadapterwssecured" />
 
-	<!-- No-op Implementation -->
-	<bean class="gov.hhs.fha.nhinc.notify.adapter.proxy.HiemNotifyAdapterNoOpImpl" id="hiemnotifyadapternoop" name="hiemnotifyadapternoop"> 
-		<meta key="impltype" value="noop"/>
-	</bean> 
+    <!-- No-op Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.subscribe.adapter.proxy.HiemSubscribeAdapterNoOpImpl" id="hiemsubscribeadapternoop" name="hiemsubscribeadapternoop"> 
+        <meta key="impltype" value="noop"/>
+    </bean>
 
-	<!-- Secured web service Implementation -->
-    <bean class="gov.hhs.fha.nhinc.notify.adapter.proxy.HiemNotifyAdapterWebServiceProxySecured" id="hiemnotifyadapterwssecured" name="hiemnotifyadapterwssecured"> 
-		<meta key="impltype" value="wssecured"/>
-	</bean> 
+    <!-- Java Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.subscribe.adapter.proxy.HiemSubscribeAdapterJavaImpl" id="hiemsubscribeadapterjava" name="hiemsubscribeadapterjava"> 
+        <meta key="impltype" value="java"/>
+    </bean>
 
-	<!-- Unsecured web service Implementation -->
-	<bean class="gov.hhs.fha.nhinc.notify.adapter.proxy.HiemNotifyAdapterWebServiceProxy" id="hiemnotifyadapterwsunsecured" name="hiemnotifyadapterwsunsecured"> 
-		<meta key="impltype" value="wsunsecured"/>
-		<meta key="default" value="true"/>
-	</bean> 
+    <!-- Secured web service Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.subscribe.adapter.proxy.HiemSubscribeAdapterWebServiceProxySecured" id="hiemsubscribeadapterwssecured" name="hiemsubscribeadapterwssecured"> 
+        <meta key="impltype" value="wssecured"/>
+        <meta key="default" value="true"/>
+    </bean>
 
-  	<!-- ******************************************************************** -->
-  	
-  	<alias alias="hiemunsubscribeadapter" name="hiemunsubscribeadapternoop" />
+    <!-- Unsecured web service Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.subscribe.adapter.proxy.HiemSubscribeAdapterWebServiceProxy" id="hiemsubscribeadapterwsunsecured" name="hiemsubscribeadapterwsunsecured"> 
+        <meta key="impltype" value="wsunsecured"/>
+    </bean>
 
-	<!-- No-op Implementation -->
-	<bean class="gov.hhs.fha.nhinc.unsubscribe.adapter.proxy.HiemUnsubscribeAdapterNoOpImpl" id="hiemunsubscribeadapternoop" name="hiemunsubscribeadapternoop"> 
-		<meta key="impltype" value="noop"/>
-		<meta key="default" value="true"/>
-	</bean> 
+    <!-- ******************************************************************** -->
 
-	<!-- Secured web service Implementation -->
-    <bean class="gov.hhs.fha.nhinc.unsubscribe.adapter.proxy.HiemUnsubscribeAdapterWebServiceProxySecured" id="hiemunsubscribeadapterwssecured" name="hiemunsubscribeadapterwssecured"> 
-		<meta key="impltype" value="wssecured"/>
-	</bean> 
+    <alias alias="hiemnotifyadapter" name="hiemnotifyadapterwssecured" />
 
-	<!-- Unsecured web service Implementation -->
-	<bean class="gov.hhs.fha.nhinc.unsubscribe.adapter.proxy.HiemUnsubscribeAdapterWebServiceProxy" id="hiemunsubscribeadapterwsunsecured" name="hiemunsubscribeadapterwsunsecured"> 
-		<meta key="impltype" value="wsunsecured"/>
-		
-	</bean> 
+    <!-- No-op Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.notify.adapter.proxy.HiemNotifyAdapterNoOpImpl" id="hiemnotifyadapternoop" name="hiemnotifyadapternoop"> 
+        <meta key="impltype" value="noop"/>
+    </bean>
+
+    <!-- Java Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.notify.adapter.proxy.HiemNotifyAdapterJavaImpl" id="hiemnotifyadapterjava" name="hiemnotifyadapterjava"> 
+        <meta key="impltype" value="java"/>
+    </bean>
+
+    <!-- Secured web service Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.notify.adapter.proxy.HiemNotifyAdapterWebServiceProxySecured" id="hiemnotifyadapterwssecured" name="hiemnotifyadapterwssecured"> 
+        <meta key="impltype" value="wssecured"/>
+        <meta key="default" value="true"/>
+    </bean>
+
+    <!-- Unsecured web service Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.notify.adapter.proxy.HiemNotifyAdapterWebServiceProxy" id="hiemnotifyadapterwsunsecured" name="hiemnotifyadapterwsunsecured"> 
+        <meta key="impltype" value="wsunsecured"/>
+    </bean>
+
+    <!-- ******************************************************************** -->
+
+    <alias alias="hiemunsubscribeadapter" name="hiemunsubscribeadapterwssecured" />
+
+    <!-- No-op Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.unsubscribe.adapter.proxy.HiemUnsubscribeAdapterNoOpImpl" id="hiemunsubscribeadapternoop" name="hiemunsubscribeadapternoop"> 
+        <meta key="impltype" value="noop"/>
+    </bean>
+
+    <!-- Java Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.unsubscribe.adapter.proxy.HiemUnsubscribeAdapterJavaImpl" id="hiemunsubscribeadapterjava" name="hiemunsubscribeadapterjava"> 
+        <meta key="impltype" value="wssecured"/>
+    </bean>
+
+    <!-- Secured web service Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.unsubscribe.adapter.proxy.HiemUnsubscribeAdapterWebServiceProxySecured" id="hiemunsubscribeadapterwssecured" name="hiemunsubscribeadapterwssecured"> 
+        <meta key="impltype" value="wssecured"/>
+        <meta key="default" value="true"/>
+    </bean>
+
+    <!-- Unsecured web service Implementation -->
+    <bean lazy-init="true" class="gov.hhs.fha.nhinc.unsubscribe.adapter.proxy.HiemUnsubscribeAdapterWebServiceProxy" id="hiemunsubscribeadapterwsunsecured" name="hiemunsubscribeadapterwsunsecured"> 
+        <meta key="impltype" value="wsunsecured"/>
+    </bean>
 
 </beans>

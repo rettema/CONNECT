@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services.
  * All rights reserved.
+ * Copyright (c) 2014, AEGIS.net, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -26,113 +27,66 @@
  */
 package gov.hhs.fha.nhinc.hiem._20.notify.nhin;
 
-import javax.xml.ws.WebServiceContext;
+import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
+import gov.hhs.fha.nhinc.hiem.consumerreference.SoapHeaderHelper;
+import gov.hhs.fha.nhinc.hiem.consumerreference.SoapMessageElements;
+import gov.hhs.fha.nhinc.hiem.dte.SoapUtil;
+import gov.hhs.fha.nhinc.messaging.server.BaseService;
+import gov.hhs.fha.nhinc.nhinclib.NhincConstants;
+import gov.hhs.fha.nhinc.nhinclib.NhincConstants.UDDI_SPEC_VERSION;
+import gov.hhs.fha.nhinc.notify.inbound.InboundHiemNotify;
 
-import oasis.names.tc.xacml._2_0.context.schema.os.DecisionType;
+import javax.xml.ws.WebServiceContext;
 
 import org.apache.log4j.Logger;
 import org.oasis_open.docs.wsn.b_2.Notify;
 import org.w3c.dom.Element;
 
-import gov.hhs.fha.nhinc.auditrepository.AuditRepositoryLogger;
-import gov.hhs.fha.nhinc.auditrepository.nhinc.proxy.AuditRepositoryProxy;
-import gov.hhs.fha.nhinc.auditrepository.nhinc.proxy.AuditRepositoryProxyObjectFactory;
-import gov.hhs.fha.nhinc.common.auditlog.LogEventRequestType;
-import gov.hhs.fha.nhinc.common.eventcommon.NotifyEventType;
-import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
-import gov.hhs.fha.nhinc.common.nhinccommonadapter.CheckPolicyRequestType;
-import gov.hhs.fha.nhinc.common.nhinccommonadapter.CheckPolicyResponseType;
-import gov.hhs.fha.nhinc.cxf.extraction.SAML2AssertionExtractor;
-import gov.hhs.fha.nhinc.hiem.dte.SoapUtil;
-import gov.hhs.fha.nhinc.nhinclib.NhincConstants;
-import gov.hhs.fha.nhinc.nhinclib.NullChecker;
-import gov.hhs.fha.nhinc.notify.nhin.NhinNotifyProcessor;
-import gov.hhs.fha.nhinc.policyengine.PolicyEngineChecker;
-import gov.hhs.fha.nhinc.policyengine.adapter.proxy.PolicyEngineProxy;
-import gov.hhs.fha.nhinc.policyengine.adapter.proxy.PolicyEngineProxyObjectFactory;
-
 /**
+ * HIEM Nhin Notify Service Implementation
  *
  * @author jhoppesc
+ * @author richard.ettema
  */
-public class HiemNotifyImpl {
+public class HiemNotifyImpl extends BaseService {
 
     private static final Logger LOG = Logger.getLogger(HiemNotifyImpl.class);
 
+    private InboundHiemNotify inboundHiemNotify;
+
+    public HiemNotifyImpl(InboundHiemNotify inboundHiemNotify) {
+        this.inboundHiemNotify = inboundHiemNotify;
+    }
+
+    /**
+     *
+     * @param notifyRequest
+     * @param context
+     */
     public void notify(Notify notifyRequest, WebServiceContext context) {
+
         LOG.debug("Entering HiemNotifyImpl.notify");
-        AssertionType assertion = SAML2AssertionExtractor.getInstance().extractSamlAssertion(context);
-
-        auditInputMessage(notifyRequest, assertion,
-                NhincConstants.AUDIT_LOG_INBOUND_DIRECTION, NhincConstants.AUDIT_LOG_NHIN_INTERFACE);
-
-        SoapUtil contextHelper = new SoapUtil();
-        Element soapMessage = contextHelper.extractSoapMessageElement(context,
-                NhincConstants.HTTP_REQUEST_ATTRIBUTE_SOAPMESSAGE);
 
         try {
-            NhinNotifyProcessor notifyProcessor = new NhinNotifyProcessor();
-            auditInputMessage(notifyRequest, assertion,
-                NhincConstants.AUDIT_LOG_OUTBOUND_DIRECTION, NhincConstants.AUDIT_LOG_ADAPTER_INTERFACE);
-            if (checkPolicy(notifyRequest, assertion)) {
-                notifyProcessor.processNhinNotify(soapMessage, assertion);
-            } else {
-                LOG.error("Failed policy check on notify message");
+            AssertionType assertion = getAssertion(context, null);
+            if (assertion != null) {
+                assertion.setImplementsSpecVersion(UDDI_SPEC_VERSION.SPEC_2_0.toString());
             }
+
+            SoapUtil contextHelper = new SoapUtil();
+            Element soapMessage = contextHelper.extractSoapMessageElement(context,
+                    NhincConstants.HTTP_REQUEST_ATTRIBUTE_SOAPMESSAGE);
+
+            SoapMessageElements referenceParametersElements = new SoapHeaderHelper().getSoapHeaderElements(context);
+
+            inboundHiemNotify.processNhinNotify(notifyRequest, soapMessage, referenceParametersElements, assertion);
+
         } catch (Throwable t) {
             LOG.debug("Exception encountered processing a notify message: " + t.getMessage(), t);
-            // TODO: Add specific catch statements and throw the appropriate fault
 
         }
+
         LOG.debug("Exiting HiemNotifyImpl.notify");
     }
 
-    private void auditInputMessage(Notify notifyRequest, AssertionType assertion,
-            String direction, String logInterface) {
-        LOG.debug("In HiemNotifyImpl.auditInputMessage");
-        try {
-            AuditRepositoryLogger auditLogger = new AuditRepositoryLogger();
-
-            gov.hhs.fha.nhinc.common.nhinccommoninternalorch.NotifyRequestType message = new gov.hhs.fha.nhinc.common.nhinccommoninternalorch.NotifyRequestType();
-            message.setAssertion(assertion);
-            message.setNotify(notifyRequest);
-
-            LogEventRequestType auditLogMsg = auditLogger.logNhinNotifyRequest(message,
-                    direction, logInterface);
-
-            if (auditLogMsg != null) {
-                AuditRepositoryProxyObjectFactory auditRepoFactory = new AuditRepositoryProxyObjectFactory();
-                AuditRepositoryProxy proxy = auditRepoFactory.getAuditRepositoryProxy();
-                proxy.auditLog(auditLogMsg, assertion);
-            }
-        } catch (Throwable t) {
-            LOG.error("Failed to log notify message: " + t.getMessage(), t);
-        }
-    }
-
-    private boolean checkPolicy(Notify notifyRequest, AssertionType assertion) {
-        LOG.debug("In HiemNotifyImpl.checkPolicy");
-        boolean policyIsValid = false;
-
-        NotifyEventType policyCheckReq = new NotifyEventType();
-        policyCheckReq.setDirection(NhincConstants.POLICYENGINE_INBOUND_DIRECTION);
-        gov.hhs.fha.nhinc.common.eventcommon.NotifyMessageType request = new gov.hhs.fha.nhinc.common.eventcommon.NotifyMessageType();
-        request.setAssertion(assertion);
-        request.setNotify(notifyRequest);
-        policyCheckReq.setMessage(request);
-
-        PolicyEngineChecker policyChecker = new PolicyEngineChecker();
-        CheckPolicyRequestType policyReq = policyChecker.checkPolicyNotify(policyCheckReq);
-        PolicyEngineProxyObjectFactory policyEngFactory = new PolicyEngineProxyObjectFactory();
-        PolicyEngineProxy policyProxy = policyEngFactory.getPolicyEngineProxy();
-        CheckPolicyResponseType policyResp = policyProxy.checkPolicy(policyReq, assertion);
-
-        if (policyResp.getResponse() != null && NullChecker.isNotNullish(policyResp.getResponse().getResult())
-                && policyResp.getResponse().getResult().get(0).getDecision() == DecisionType.PERMIT) {
-            policyIsValid = true;
-        }
-
-        LOG.debug("Finished HiemNotifyImpl.checkPolicy - valid: " + policyIsValid);
-        return policyIsValid;
-    }
 }

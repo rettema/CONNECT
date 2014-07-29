@@ -1,50 +1,56 @@
 /*
- * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services. 
- * All rights reserved. 
+ * Copyright (c) 2012, United States Government, as represented by the Secretary of Health and Human Services.
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
- *     * Redistributions of source code must retain the above 
- *       copyright notice, this list of conditions and the following disclaimer. 
- *     * Redistributions in binary form must reproduce the above copyright 
- *       notice, this list of conditions and the following disclaimer in the documentation 
- *       and/or other materials provided with the distribution. 
- *     * Neither the name of the United States Government nor the 
- *       names of its contributors may be used to endorse or promote products 
- *       derived from this software without specific prior written permission. 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the documentation
+ *       and/or other materials provided with the distribution.
+ *     * Neither the name of the United States Government nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY 
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND 
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE UNITED STATES GOVERNMENT BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package gov.hhs.fha.nhinc.subscription.filters.documentfilter;
 
-//import gov.hhs.fha.nhinc.NHINCLib.NullChecker;
 import gov.hhs.fha.nhinc.nhinclib.NullChecker;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.JAXBElement;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
+
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.AdhocQueryType;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
+
+import org.apache.log4j.Logger;
 import org.oasis_open.docs.wsn.b_2.Subscribe;
 import org.w3c.dom.Element;
 
-import org.apache.log4j.Logger;
-
 /**
- * 
+ * AdhocQuery helper to manage DSUB subscriptions
+ *
  * @author rayj
+ * @author richard.ettema
  */
 public class AdhocQueryHelper {
 
     private static final Logger LOG = Logger.getLogger(AdhocQueryHelper.class);
 
+    @SuppressWarnings({ "rawtypes" })
     public static AdhocQueryType getAdhocQuery(Subscribe nhinSubscribe) {
         AdhocQueryType adhocQuery = null;
         LOG.info("begin getAdhocQuery");
@@ -53,16 +59,12 @@ public class AdhocQueryHelper {
 
         for (Object anyItem : any) {
             LOG.info("anyItem=" + anyItem);
-            if (anyItem instanceof oasis.names.tc.ebxml_regrep.xsd.rim._3.AdhocQueryType) {
+            if (anyItem instanceof AdhocQueryType) {
                 adhocQuery = (AdhocQueryType) anyItem;
             }
             if (anyItem instanceof Element) {
                 Element element = (Element) anyItem;
                 LOG.info("element.getNodeName()=" + element.getNodeName());
-
-                Object o = (JAXBElement<oasis.names.tc.ebxml_regrep.xsd.rim._3.AdhocQueryType>) nhinSubscribe.getAny();
-
-                // Object o = (JAXBElement<oasis.names.tc.ebxml_regrep.xsd.rim._3.AdhocQueryType>) anyItem;
             }
             if (anyItem instanceof JAXBElement) {
                 LOG.info("jaxbelement.getValue=" + ((JAXBElement) anyItem).getValue());
@@ -119,8 +121,7 @@ public class AdhocQueryHelper {
         return matchingSlotValues;
     }
 
-    public static String findSlotValue(Subscribe nhinSubscribe, String slotName)
-            throws MultipleSlotValuesFoundException {
+    public static String findSlotValue(Subscribe nhinSubscribe, String slotName) throws MultipleSlotValuesFoundException {
         List<String> slotValues = findSlotValues(nhinSubscribe, slotName);
         return findSingleSlotValue(slotValues);
     }

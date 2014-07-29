@@ -2,20 +2,21 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="gov.hhs.fha.nhinc.subscription.repository.data">
   <class name="SubscriptionStorageItem" table="subscription">
-    <id column="id" length="128" name="recordId" type="string">
-      <generator class="uuid"/>
+    <id column="id" name="id" type="long">
+      <generator class="increment"/>
     </id>
-    <property column="Subscriptionid" name="subscriptionId" not-null="false" type="string"/>
-    <property column="SubscribeXML" name="subscribeXML" not-null="false" type="string"/>
-    <property column="SubscriptionReferenceXML" name="subscriptionReferenceXML" not-null="false" type="string"/>
-    <property column="RootTopic" length="128" name="rootTopic" not-null="false" type="string"/>
-    <property column="ParentSubscriptionId" length="128" name="parentSubscriptionId" not-null="false" type="string"/>
-    <property column="ParentSubscriptionReferenceXML" name="parentSubscriptionReferenceXML" not-null="false" type="string"/>
-    <property column="Consumer" length="128" name="consumer" not-null="false" type="string"/>
-    <property column="Producer" length="128" name="producer" not-null="false" type="string"/>
-    <property column="PatientId" length="128" name="patientId" not-null="false" type="string"/>
-    <property column="PatientAssigningAuthority" length="128" name="patientAssigningAuthority" not-null="false" type="string"/>
-    <property column="Targets" name="targets" not-null="false" type="string"/>
-    <property column="CreationDate" length="64" name="creationDate" not-null="false" type="timestamp"/>
+    <property column="subscriptionId" length="128" name="subscriptionId" not-null="false" type="string"/>
+    <property column="subscriptionStatus" length="45" name="subscriptionStatus" not-null="false" type="string"/>
+    <property column="subscriptionRole" length="45" name="subscriptionRole" not-null="false" type="string"/>
+    <property column="topic" length="255" name="topic" not-null="false" type="string"/>
+    <property column="dialect" length="255" name="dialect" not-null="false" type="string"/>
+    <property column="consumer" length="128" name="consumer" not-null="false" type="string"/>
+    <property column="producer" length="128" name="producer" not-null="false" type="string"/>
+    <property column="patientId" length="128" name="patientId" not-null="false" type="string"/>
+    <property column="patientAssigningAuthority" length="128" name="patientAssigningAuthority" not-null="false" type="string"/>
+    <property column="creationTime" length="64" name="creationTime" not-null="false" type="timestamp"/>
+    <property column="targets" name="targets" not-null="false" type="string"/>
+    <property column="subscribeXML" name="subscribeXML" not-null="false" type="string"/>
+    <property column="subscriptionReferenceXML" name="subscriptionReferenceXML" not-null="false" type="string"/>
   </class>
 </hibernate-mapping>

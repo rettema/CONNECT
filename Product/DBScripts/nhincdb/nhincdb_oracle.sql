@@ -114,19 +114,33 @@ CREATE TABLE nhincuser.correlatedidentifiers (
 );
 
 CREATE TABLE nhincuser.subscription (
-    id varchar2(128) NOT NULL,
-    Subscriptionid varchar2(128),
-    SubscribeXML BLOB,
-    SubscriptionReferenceXML BLOB,
-    RootTopic BLOB,
-    ParentSubscriptionId varchar2(128),
-    ParentSubscriptionReferenceXML BLOB,
+    id number(11) NOT NULL,
+    SubscriptionId varchar2(128),
+    SubscriptionStatus varchar2(128),
+    SubscriptionRole varchar2(45),
+    Topic varchar2(255),
+    Dialect varchar2(255),
     Consumer varchar2(128),
     Producer varchar2(128),
     PatientId varchar2(128),
     PatientAssigningAuthority varchar2(128),
+    CreationTime DATE,
+    SubscribeXML BLOB,
+    SubscriptionReferenceXML BLOB,
     Targets BLOB,
-    CreationDate DATE,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE nhincuser.notification (
+    id number(11) NOT NULL,
+    SubscriptionId number(11),
+    NotificationStatus varchar2(128),
+    Topic varchar2(255),
+    Dialect varchar2(255),
+    FileName varchar2(255),
+    NotificationTime DATE,
+    NotificationMessage BLOB,
+    AcknowledgementMessage BLOB,
   PRIMARY KEY(id)
 );
 

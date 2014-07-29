@@ -46,7 +46,7 @@ import org.junit.Test;
 
 /**
  * @author akong
- * 
+ *
  */
 public class CONNECTCXFClientSecuredTest {
 
@@ -54,7 +54,7 @@ public class CONNECTCXFClientSecuredTest {
     private final MTOMServiceEndpointDecoratorTest mtomTest = new MTOMServiceEndpointDecoratorTest();
     private final SoapResponseServiceEndpointDecoratorTest responseTest = new SoapResponseServiceEndpointDecoratorTest();
     private final URLServiceEndpointDecoratorTest urlTest = new URLServiceEndpointDecoratorTest();
-    
+
     private final SAMLServiceEndpointDecoratorTest samlTest = new SAMLServiceEndpointDecoratorTest();
     private final TLSClientServiceEndpointDecoratorTest tlsTest = new TLSClientServiceEndpointDecoratorTest();
     private final WsAddressingServiceEndpointDecoratorTest addressTest = new WsAddressingServiceEndpointDecoratorTest();
@@ -66,19 +66,18 @@ public class CONNECTCXFClientSecuredTest {
      */
     @Test
     public void ensureInterceptorCountIsConstant() {
-        String url = "url";
         String wsAddressingTo = "wsAddressingTo";
         AssertionType assertion = new AssertionType();
-        
-        CONNECTClient<TestServicePortType> client = createClient(url, assertion, wsAddressingTo);
+
+        CONNECTClient<TestServicePortType> client = createClient(wsAddressingTo, assertion);
 
         Client cxfClient = ClientProxy.getClient(client.getPort());
         int numInInterceptors = cxfClient.getInInterceptors().size();
         int numOutInterceptors = cxfClient.getOutInterceptors().size();
 
-        createClient(url, assertion, wsAddressingTo);
-        createClient(url, assertion, wsAddressingTo);
-        CONNECTClient<TestServicePortType> client2 = createClient(url, assertion, wsAddressingTo);
+        createClient(wsAddressingTo, assertion);
+        createClient(wsAddressingTo, assertion);
+        CONNECTClient<TestServicePortType> client2 = createClient(wsAddressingTo, assertion);
 
         Client cxfClient2 = ClientProxy.getClient(client2.getPort());
         assertEquals(numInInterceptors, cxfClient2.getInInterceptors().size());
@@ -87,7 +86,6 @@ public class CONNECTCXFClientSecuredTest {
 
     @Test
     public void securedClientConfiguration() {
-        String url = "url";
         String wsAddressingTo = "wsAddressingTo";
         String messageId = "urn:uuid:messageId";
         String relatesTo = "relatesTo";
@@ -96,12 +94,12 @@ public class CONNECTCXFClientSecuredTest {
         assertion.getRelatesToList().add(relatesTo);
         ServicePortDescriptor<TestServicePortType> portDescriptor = new TestServicePortDescriptor();
 
-        CONNECTClient<TestServicePortType> client = createClient(url, assertion, wsAddressingTo);
-        
+        CONNECTClient<TestServicePortType> client = createClient(wsAddressingTo, assertion);
+
         // default configuration
         timeoutTest.verifyTimeoutIsSet(client);
         responseTest.verifySoapResponseInInterceptor(client);
-        urlTest.verifyURLConfiguration(client, url);
+        urlTest.verifyURLConfiguration(client, wsAddressingTo);
 
         // secured configuration
         samlTest.verifySAMLConfiguration(client, assertion);
@@ -110,10 +108,9 @@ public class CONNECTCXFClientSecuredTest {
                 messageId, relatesTo);
         securityTest.verifyWsSecurityProperties(client);
     }
-    
+
     @Test
     public void testEnableMtom() {
-        String url = "url";
         String wsAddressingTo = "wsAddressingTo";
         String messageId = "urn:uuid:messageId";
         String relatesTo = "relatesTo";
@@ -122,13 +119,13 @@ public class CONNECTCXFClientSecuredTest {
         assertion.getRelatesToList().add(relatesTo);
         ServicePortDescriptor<TestServicePortType> portDescriptor = new TestServicePortDescriptor();
 
-        CONNECTClient<TestServicePortType> client = createClient(url, assertion, wsAddressingTo);
+        CONNECTClient<TestServicePortType> client = createClient(wsAddressingTo, assertion);
         client.enableMtom();
-        
+
         // default configuration
         timeoutTest.verifyTimeoutIsSet(client);
         responseTest.verifySoapResponseInInterceptor(client);
-        urlTest.verifyURLConfiguration(client, url);
+        urlTest.verifyURLConfiguration(client, wsAddressingTo);
 
         // secured configuration
         samlTest.verifySAMLConfiguration(client, assertion);
@@ -136,14 +133,14 @@ public class CONNECTCXFClientSecuredTest {
         addressTest.verifyAddressingProperties(client, wsAddressingTo, portDescriptor.getWSAddressingAction(),
                 messageId, relatesTo);
         securityTest.verifyWsSecurityProperties(client);
-        
+
         // mtom configuration
         mtomTest.verifyMTOMEnabled(client);
     }
 
-    private CONNECTClient<TestServicePortType> createClient(String url, AssertionType assertion, String wsAddressingTo) {
+    private CONNECTClient<TestServicePortType> createClient(String url, AssertionType assertion) {
         return CONNECTClientFactory.getInstance().getCONNECTClientSecured(new TestServicePortDescriptor(), url,
-                assertion, wsAddressingTo, null);
+                assertion, null);
     }
 
 }

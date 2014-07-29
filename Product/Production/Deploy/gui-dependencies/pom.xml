@@ -33,5 +33,12 @@
             <type>war</type>
             <optional>false</optional>
         </dependency>
+        <dependency>
+            <groupId>org.connectopensource</groupId>
+            <artifactId>CONNECTEventMessagingGUI</artifactId>
+            <version>${project.parent.version}</version>
+            <type>war</type>
+            <optional>false</optional>
+        </dependency>
     </dependencies>
 </project>

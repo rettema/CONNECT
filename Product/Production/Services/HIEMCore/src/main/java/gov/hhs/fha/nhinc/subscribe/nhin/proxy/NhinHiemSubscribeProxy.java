@@ -26,7 +26,6 @@
  */
 package gov.hhs.fha.nhinc.subscribe.nhin.proxy;
 
-
 import gov.hhs.fha.nhinc.common.nhinccommon.AssertionType;
 import gov.hhs.fha.nhinc.common.nhinccommon.NhinTargetSystemType;
 
@@ -36,10 +35,11 @@ import org.oasis_open.docs.wsn.b_2.SubscribeResponse;
 /**
  *
  * @author jhoppesc
+ * @author richard.ettema
  */
 public interface NhinHiemSubscribeProxy {
 
-    public SubscribeResponse subscribe(Subscribe subscribeElement, AssertionType assertion, 
-    		NhinTargetSystemType target)
+    public SubscribeResponse subscribe(Subscribe subscribeElement, AssertionType assertion, NhinTargetSystemType target)
             throws Exception;
+
 }
