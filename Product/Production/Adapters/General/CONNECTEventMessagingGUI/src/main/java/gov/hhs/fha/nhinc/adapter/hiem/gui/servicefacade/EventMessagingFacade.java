@@ -41,7 +41,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
- * HIEM Re-implementation - 2014-06-19
+ * Methods to populate UI
  *
  * @author richard.ettema
  */

@@ -36,7 +36,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 /**
- * HIEM Re-implementation - 2014-06-19
+ * Data format helper class
  *
  * @author richard.ettema
  */

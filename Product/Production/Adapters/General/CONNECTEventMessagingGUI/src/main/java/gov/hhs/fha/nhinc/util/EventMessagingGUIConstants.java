@@ -27,7 +27,7 @@
 package gov.hhs.fha.nhinc.util;
 
 /**
- * HIEM Re-implementation - 2014-06-19
+ * Application Constants
  *
  * @author richard.ettema
  */

@@ -37,7 +37,7 @@ import java.util.List;
 import javax.faces.FacesException;
 
 /**
- * HIEM Re-implementation - 2014-06-19
+ * User session properties
  * 
  * @author richard.ettema
  */

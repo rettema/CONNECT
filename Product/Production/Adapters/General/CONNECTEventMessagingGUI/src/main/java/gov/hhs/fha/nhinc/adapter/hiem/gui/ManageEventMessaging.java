@@ -54,8 +54,6 @@ import org.apache.log4j.Logger;
  * behavior to respond to incoming events.
  * </p>
  *
- * HIEM Re-implementation - 2014-06-19
- *
  * @version ManageEventMessaging.java
  * @version Created on May 15, 2014, 08:22:53 PM
  *
